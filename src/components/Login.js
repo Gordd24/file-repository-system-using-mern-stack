@@ -1,13 +1,15 @@
-import bgbul from '../images/bgbul.jpg';
+import star from '../images/star.jpg';
+import './main.css';
+
 
 function Login(){
     return(
         <div className="row h-100">
-
-             <div className="col-6">
+             
+             <div className="col-md-6 col-sm-12">
 
                 <div className='row d-flex justify-content-center h-100'>
-                    <div className='col-10 border rounded my-auto p-5 shadow-lg'>
+                    <div className='col-10 rounded my-auto p-3 shadow-lg'>
                             <div className='row mb-5'>
                                 <div className='col-12'>
                                     <h1>CICT DRIVE</h1>
@@ -45,7 +47,7 @@ function Login(){
 
                             <div className='row  my-2'>
                                 <div className='col-12'>
-                                    <input type="Submit" className="form-control bg-primary text-light" id="submit" value="Sign In" />
+                                    <input type="Submit" className="submit form-control bg-primary text-light" id="submit" value="Sign In" />
                                 </div>
                             </div>
 
@@ -56,7 +58,9 @@ function Login(){
 
             </div>
 
-            <div className="col-6 full-img" style={{ backgroundImage: `url(${bgbul})`,  backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundPosition: 'center'}}></div>
+            <div className="col-6 d-none d-md-block full-img" style={{ backgroundImage: `url(${star})`,  backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundPosition: 'center'}}></div>
+
+           
 
         </div>
 
