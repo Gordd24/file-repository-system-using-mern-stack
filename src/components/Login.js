@@ -1,8 +1,39 @@
 import star from '../images/star.jpg';
 import './main.css';
+import {useState} from 'react'
 
 
 function Login(){
+
+    const [username, setUsername] = useState('')
+    const [password, setPassword] = useState('')
+  
+
+    async function loginUser(e){
+        e.preventDefault()
+        const response = await fetch('http://localhost:1337/api/login',{
+          method: 'POST',
+          headers:{
+              'Content-Type': 'application/json',
+          },
+            body: JSON.stringify({
+              username,password,
+            }),
+        })
+    
+        const data = await response.json()
+        console.log(data)
+  
+        if(data.user){
+          localStorage.setItem('token', data.user)
+          alert('login success')
+          window.location.href ='/home'
+        }else{
+          alert('please check username password')
+        }
+      }
+      
+
     return(
         <div className="row h-100">
              
@@ -16,7 +47,7 @@ function Login(){
                                 </div>
                             </div>
                         
-                        <form>
+                        <form onSubmit={loginUser}>
 
                             <div className='row my-3'>
                                 <div className='col-12'>
@@ -26,14 +57,14 @@ function Login(){
                             
                             <div className='row  my-3'>
                                 <div className='col-12'>
-                                    <input type="text" className="form-control" id="username" placeholder="Username" />
+                                    <input type="text" className="form-control" id="username" value={username} onChange={(e)=> setUsername(e.target.value)} placeholder="Username" />
                                 </div>
                             </div>
 
 
                             <div className='row  my-3'>
                                 <div className='col-12'>
-                                    <input type="password" className="form-control" id="password" placeholder="Password" />
+                                    <input type="password" value={password} onChange={(e)=> setPassword(e.target.value)} className="form-control" id="password" placeholder="Password" />
                                 </div>
                             </div>
 
@@ -47,7 +78,7 @@ function Login(){
 
                             <div className='row  my-2'>
                                 <div className='col-12'>
-                                    <input type="Submit" className="submit form-control bg-primary text-light" id="submit" value="Sign In" />
+                                    <input type="submit" className="submit form-control bg-primary text-light" id="submit" value="Sign In" />
                                 </div>
                             </div>
 
