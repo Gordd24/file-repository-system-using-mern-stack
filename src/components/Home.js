@@ -1,37 +1,15 @@
-import React, { useEffect } from "react";
-import jwt_decode from "jwt-decode"
-import {useHistory} from 'react-router-dom';
-
-const Home = () =>{
-    const history = useHistory()
-
-    async function populateQuote() {
-        const req = await fetch('http://localhost:1337/api/quote',{
+function Home(){
+    return(
+        <div className="row h-100 bg-secondary justify-content-center">
+            <div className="col-12 text-center my-auto text-light">
+               <h1>Home Page</h1>
+               <br></br>
+               <h5 className="text-dark">Coming Soon..</h5>
+            </div>
             
-            headers:{
-                'x-access-token': localStorage.getItem('token'),
-            },
-        })
-
-        const data = req.json()
-        console.log(data)
-      }
-
-    useEffect(()=>{
-        const token = localStorage.getItem('token')
-        if(token){
-            const user =jwt_decode(token)
-            if(!user){
-                localStorage.removeItem('token')
-                history.replace('/login')
-            }else{
-                populateQuote()
-            }
-        }
-    }) 
-    
-
-    return <h1>Hello</h1>
+        </div>
+    )
 }
 
-export default Home
+
+export default Home;
