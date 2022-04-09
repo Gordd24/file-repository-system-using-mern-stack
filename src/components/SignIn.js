@@ -44,7 +44,7 @@ function SignIn(){
 
                 {/* login card */}
                 <div className='row justify-content-center'>
-                    <div className='col-10 border rounded shadow-lg py-5'>
+                    <div className='col-10 bg-dark text-light border rounded shadow-lg py-5'>
                     
                         <div className='row mb-5 mx-3'>
                             <div className='col'>
