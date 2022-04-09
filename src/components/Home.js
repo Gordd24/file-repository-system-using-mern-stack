@@ -1,4 +1,16 @@
 import lib from './img/lib.jpg'
+
+function logout(event){
+    event.preventDefault()
+
+    if(window.confirm("Do you want to logout?")===true){
+        console.log('signed out')
+        window.location.href = '/sign_in'
+    }else{
+        console.log('cancelled')
+    }
+    
+}
 function Home(){
     return(
         <div className="h-100">
@@ -24,7 +36,7 @@ function Home(){
                                             </a>
                                             <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
                                                 <li><a className="dropdown-item" href="#">Update</a></li>
-                                                <li><a className="dropdown-item" href="#">Sign Out</a></li>
+                                                <li><a className="dropdown-item" onClick={logout} href='#'>Sign Out</a></li>
                                             </ul>
                                         </li>
                                     </div>
