@@ -13,6 +13,7 @@ function SignIn(){
     function signIn(e) {
         e.preventDefault();
         console.log('Attempted to Sign In...');
+       
 
         fetch('http://localhost:1337/sign_in',{
             method:'POST',
@@ -38,7 +39,7 @@ function SignIn(){
 
     return(
        <div className="row h-100">
-
+            
             <div className="col-md-6 col-sm-12 my-auto">    
 
                 {/* login card */}

@@ -6,12 +6,21 @@ import { BrowserRouter, Route, Routes} from 'react-router-dom';
 function App() {
   return (
     <div className="h-100">
-        <BrowserRouter>
+        {/* <BrowserRouter>
           <Routes>
             <Route path="/sign_in" element ={<SignIn />}/>
             <Route path="/home" element ={<Home />}/>
           </Routes>
+        </BrowserRouter> */}
+
+        <BrowserRouter>
+          <Routes>
+            <Route path="/sign_in" element ={<SignIn />}/>
+            <Route path='/home' element={<Home/>}></Route>
+          </Routes>
         </BrowserRouter>
+
+
     </div>
   );
 }
