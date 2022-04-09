@@ -66,9 +66,9 @@ function SignIn(){
                                 </div>
                             </div>
 
-                            <div className='row  justify-content-center'>
+                            <div className='row  justify-content-center mx-3'>
                                 <div className='col-10'>
-                                    <Button />
+                                    <Button val="Sign In"/>
                                 </div>
                             </div>
                         </form>
@@ -80,7 +80,7 @@ function SignIn(){
             </div>
 
 
-           <div className="col-6 d-none d-md-block bg-warning" style={{ backgroundImage: `url(${lib})`,  backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundPosition: 'center'}}>    
+           <div className="col-6 d-none d-md-block" style={{ backgroundImage: `url(${lib})`,  backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundPosition: 'center'}}>    
 
            </div>
        </div>

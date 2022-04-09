@@ -1,17 +1,24 @@
 import lib from './img/lib.jpg'
+import AreaCard from './AreaCard'
 
-function logout(event){
-    event.preventDefault()
 
-    if(window.confirm("Do you want to logout?")===true){
-        console.log('signed out')
-        window.location.href = '/sign_in'
-    }else{
-        console.log('cancelled')
+
+
+function Home(){
+
+
+    function logout(event){
+        event.preventDefault()
+    
+        if(window.confirm("Do you want to logout?")===true){
+            console.log('signed out')
+            window.location.href = '/sign_in'
+        }else{
+            console.log('cancelled')
+        }
+        
     }
     
-}
-function Home(){
     return(
         <div className="h-100">
                 <div className="row navbar-static-top">
@@ -19,7 +26,7 @@ function Home(){
                     
                         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
                             <div className="container-fluid">
-                                <a className="navbar-brand" href="#">CICT Drive</a>
+                                <a className="navbar-brand" href="/home">CICT Drive</a>
 
                                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                                     <span className="navbar-toggler-icon"></span>
@@ -27,8 +34,8 @@ function Home(){
 
                                 <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
                                     <div className="navbar-nav">
-                                        <a className="nav-link active" href="#">Home</a>
-                                        <a className="nav-link" href="#">Registration</a>
+                                        <a className="nav-link active" href="/home">Home</a>
+                                        <a className="nav-link" href="/registration">Registration</a>
                                         <a className="nav-link" href="#">Logs</a>
                                         <li className="nav-item dropdown">
                                             <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -64,124 +71,26 @@ function Home(){
                                     {/* first row 3 boxes */}
                                     <div className="row justify-content-center my-3">
 
-                                        <div className="col-5 col-lg-2 mx-3 mx-sm-2 my-2 p-0">
-
-                                            <div class="card text-white shadow-lg" style={{ maxWidth: '18rem'}}>
-                                                <div class="card-header bg-dark"><h5>Area 1</h5></div>
-                                                <div class="card-body bg-secondary">
-                                                    <p class="card-text p-3">Mission, Vision, Goals and Objectives</p>
-                                                </div>
-                                            </div>
-
-                                        </div>
-
-                                        <div className="col-5 col-lg-2 mx-3 mx-sm-2 my-2 p-0">
-
-                                            <div class="card text-white shadow-lg " style={{ maxWidth: '18rem'}}>
-                                                <div class="card-header bg-dark"><h5>Area 1</h5></div>
-                                                <div class="card-body bg-secondary">
-                                                    <p class="card-text p-3">Mission, Vision, Goals and Objectives</p>
-                                                </div>
-                                            </div>
-
-                                        </div>
-
-                                        <div className="col-5 col-lg-2 mx-3 mx-sm-2 my-2 p-0">
-
-                                            <div class="card text-white shadow-lg " style={{ maxWidth: '18rem'}}>
-                                                <div class="card-header bg-dark"><h5>Area 1</h5></div>
-                                                <div class="card-body bg-secondary">
-                                                    <p class="card-text p-3">Mission, Vision, Goals and Objectives</p>
-                                                </div>
-                                            </div>
-
-                                        </div>
-
-                                        <div className="col-5 col-lg-2 mx-3 mx-sm-2 my-2 p-0">
-
-                                            <div class="card text-white shadow-lg " style={{ maxWidth: '18rem'}}>
-                                                <div class="card-header bg-dark"><h5>Area 1</h5></div>
-                                                <div class="card-body bg-secondary">
-                                                    <p class="card-text p-3">Mission, Vision, Goals and Objectives</p>
-                                                </div>
-                                            </div>
-
-                                        </div>
-
-                                        <div className="col-5 col-lg-2 mx-3 mx-sm-2 my-2 p-0">
-
-                                            <div class="card text-white shadow-lg " style={{ maxWidth: '18rem'}}>
-                                                <div class="card-header bg-dark"><h5>Area 1</h5></div>
-                                                <div class="card-body bg-secondary">
-                                                    <p class="card-text p-3">Mission, Vision, Goals and Objectives</p>
-                                                </div>
-                                            </div>
-
-                                        </div>
+                                        <AreaCard desc="Mission, Vision, Goals and Objectives" area="1"/>
+                                        <AreaCard desc="Faculty" area="2"/>
+                                        <AreaCard desc="Curriculum and Instruction" area="3"/>
+                                        <AreaCard desc="Students" area="4"/>
+                                        <AreaCard desc="Research" area="5"/>
 
                                     </div>
                                     {/* END first row 3 boxes */}   
 
-                                    {/* first row 3 boxes */}
+                                    {/* Second row 3 boxes */}
                                     <div className="row justify-content-center my-3">
-
-                                        <div className="col-5 col-lg-2 mx-3 mx-sm-2 my-2 p-0">
-
-                                            <div class="card text-white shadow-lg" style={{ maxWidth: '18rem'}}>
-                                                <div class="card-header bg-dark"><h5>Area 1</h5></div>
-                                                <div class="card-body bg-secondary">
-                                                    <p class="card-text p-3">Mission, Vision, Goals and Objectives</p>
-                                                </div>
-                                            </div>
-
-                                        </div>
-
-                                        <div className="col-5 col-lg-2 mx-3 mx-sm-2 my-2 p-0">
-
-                                            <div class="card text-white shadow-lg " style={{ maxWidth: '18rem'}}>
-                                                <div class="card-header bg-dark"><h5>Area 1</h5></div>
-                                                <div class="card-body bg-secondary">
-                                                    <p class="card-text p-3">Mission, Vision, Goals and Objectives</p>
-                                                </div>
-                                            </div>
-
-                                        </div>
-
-                                        <div className="col-5 col-lg-2 mx-3 mx-sm-2 my-2 p-0">
-
-                                            <div class="card text-white shadow-lg " style={{ maxWidth: '18rem'}}>
-                                                <div class="card-header bg-dark"><h5>Area 1</h5></div>
-                                                <div class="card-body bg-secondary">
-                                                    <p class="card-text p-3">Mission, Vision, Goals and Objectives</p>
-                                                </div>
-                                            </div>
-
-                                        </div>
-
-                                        <div className="col-5 col-lg-2 mx-3 mx-sm-2 my-2 p-0">
-
-                                            <div class="card text-white shadow-lg " style={{ maxWidth: '18rem'}}>
-                                                <div class="card-header bg-dark"><h5>Area 1</h5></div>
-                                                <div class="card-body bg-secondary">
-                                                    <p class="card-text p-3">Mission, Vision, Goals and Objectives</p>
-                                                </div>
-                                            </div>
-
-                                        </div>
-
-                                        <div className="col-5 col-lg-2 mx-3 mx-sm-2 my-2 p-0">
-
-                                            <div class="card text-white shadow-lg " style={{ maxWidth: '18rem'}}>
-                                                <div class="card-header bg-dark"><h5>Area 1</h5></div>
-                                                <div class="card-body bg-secondary">
-                                                    <p class="card-text p-3">Mission, Vision, Goals and Objectives</p>
-                                                </div>
-                                            </div>
-
-                                        </div>
+                                      
+                                        <AreaCard desc="Extension" area="6"/>
+                                        <AreaCard desc="Library" area="7"/>
+                                        <AreaCard desc="Physical Facilities" area="8"/>
+                                        <AreaCard desc="Laboratories" area="9"/>
+                                        <AreaCard desc="Administration" area="10"/>
 
                                     </div>
-                                    {/* END first row 3 boxes */}
+                                    {/* END Second row 3 boxes */}
 
 
                                     
