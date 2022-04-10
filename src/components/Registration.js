@@ -2,21 +2,33 @@ import lib from './img/lib.jpg';
 import Field from './Field';
 import Button from './Button';
 import React,{useState} from 'react';
-
+import logout from './Logout';
 function Registration(){
 
 
-    function logout(event){
+    /* async function register2(event){
         event.preventDefault();
-    
-        if(window.confirm("Do you want to logout?")===true){
-            console.log('signed out')
-            window.location.href = '/sign_in'
-        }else{
-            console.log('cancelled')
+        console.log('Attempting to Sign Up...');
+
+        const response = await fetch('http://localhost:1337/sign_up', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				fName,mName,lName,email,username,password,area,type
+			}),
+		})
+
+		const data = await response.json()
+
+		if (data.status === 'ok') {
+			
+            console.log(data)
+		}else{
+            console.log(data.status)
         }
-        
-    }
+    } */
 
     function register(event){
         event.preventDefault();

@@ -1,23 +1,11 @@
 import lib from './img/lib.jpg'
 import AreaCard from './AreaCard'
+import logout from './Logout';
 
 
 
 
 function Home(){
-
-
-    function logout(event){
-        event.preventDefault()
-    
-        if(window.confirm("Do you want to logout?")===true){
-            console.log('signed out')
-            window.location.href = '/sign_in'
-        }else{
-            console.log('cancelled')
-        }
-        
-    }
     
     return(
         <div className="h-100">
