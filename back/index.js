@@ -38,15 +38,15 @@ const UserSchema = new mongoose.Schema({
   });
 
 const RegisterSchema = new mongoose.Schema({
-    fName:{type: String},
+    fName:{type: String, required: true,},
     mName:{type: String},
-    lName:{type: String},
-    email:{type: String},
-    username:{type: String},
-    password:{type: String},
+    lName:{type: String, required: true,},
+    email:{type: String, required: true,unique: true},
+    username:{type: String, required: true, unique: true},
+    password:{type: String, required: true,},
     //confirm_password:{type: String, required: true},
-    area:{type: String},
-    type:{type: String}
+    area:{type: String, required: true,},
+    type:{type: String, required: true,}
 })
 
 
@@ -132,14 +132,37 @@ app.get("/users", async (request, response) => {
 
 
 //Route For Sign in
+// app.post("/sign_in", async (request, response) => {
+
+//   const user = await UserModel.findOne({
+//     username: request.body.username,
+//     password: request.body.password,
+//   })
+
+//   if (user){
+//         return response.json({status:'user-found'})
+//   }else{
+//         return response.json({status:'user-not-found'})
+//   }
+// });
+//Route For Sign in with 
 app.post("/sign_in", async (request, response) => {
 
-  const user = await UserModel.findOne({
+  const user = await RegisterModel.findOne({
     username: request.body.username,
-    password: request.body.password,
   })
 
-  if (user){
+  if(!user){
+    return response.json({status:'user-not-found'})
+  }
+
+  const isPasswordCorrect = await bcrypt.compare(
+    request.body.password,
+    user.password
+
+  )
+
+  if (isPasswordCorrect){
         return response.json({status:'user-found'})
   }else{
         return response.json({status:'user-not-found'})
