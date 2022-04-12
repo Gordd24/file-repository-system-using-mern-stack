@@ -53,7 +53,7 @@ function Home(){
                             </div>
 
 
-                            <div className="row border py-4 overflow-auto" style={{ height: '83vh'}}>
+                            <div className="row border py-4 overflow-auto" style={{ height: '84vh'}}>
                                 <div className="col">
 
                                     {/* first row 3 boxes */}

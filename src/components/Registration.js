@@ -5,36 +5,11 @@ import React,{useState} from 'react';
 import logout from './Logout';
 function Registration(){
 
-
-    /* async function register2(event){
-        event.preventDefault();
-        console.log('Attempting to Sign Up...');
-
-        const response = await fetch('http://localhost:1337/sign_up', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				fName,mName,lName,email,username,password,area,type
-			}),
-		})
-
-		const data = await response.json()
-
-		if (data.status === 'ok') {
-			
-            console.log(data)
-		}else{
-            console.log(data.status)
-        }
-    } */
-
     function register(event){
         event.preventDefault();
         console.log('Attempting to Sign Up...');
 
-        fetch('http://localhost:1337/sign_up',{
+        fetch('http://localhost:1337/cictdrive/sign_up',{
             method: 'POST',
             headers: {
                 'Content-Type':'application/json'
@@ -43,7 +18,14 @@ function Registration(){
                 fName,mName,lName,email,username,password,area,type
             })
         }).then(res => res.json())
-        .then(data => console.log(data.status))
+        .then(data => 
+            {
+                if(data.status=="ok"){
+                    alert('Succesfully Created!')
+                    window.location.href = '/registration';
+                }
+            }
+            )
     }
 
     const[fName,setFName] = useState('');
@@ -120,19 +102,19 @@ function Registration(){
                                                 <div className='row border rounded shadow mx-1 mt-3'>
                                                     <div className='col'>
                                                         <h5 className='border-bottom my-2 p-1'>Personal Name</h5>
-                                                        <Field type="text" placeholder="First Name" setVal={setFName} val={fName}/>
-                                                        <Field type="text" placeholder="Middle Name" setVal={setMName} val={mName}/>
-                                                        <Field type="text" placeholder="Last Name" setVal={setLName} val={lName}/>
+                                                        <Field type="text" placeholder="First Name" required="*" setVal={setFName} val={fName}/>
+                                                        <Field type="text" placeholder="Middle Name" required="" setVal={setMName} val={mName}/>
+                                                        <Field type="text" placeholder="Last Name" required="*" setVal={setLName} val={lName}/>
                                                     </div>
                                                 </div>
 
                                                 <div className='row border rounded mx-1 mt-3 shadow'>
                                                     <div className='col'>
                                                         <h5 className='my-2 p-1 border-bottom p-2'>Account Credentials</h5>
-                                                        <Field type="email" placeholder="Email" setVal={setEmail} val={email}/>
-                                                        <Field type="text" placeholder="Username" setVal={setUsername} val={username}/>
-                                                        <Field type="password" placeholder="Password" setVal={setPassword} val={password}/>
-                                                        <Field type="password" placeholder="Confirm Password" setVal={setConfirmPassword} val={confirmPassword}/>
+                                                        <Field type="email" placeholder="Email" required="*" setVal={setEmail} val={email}/>
+                                                        <Field type="text" placeholder="Username" required="*" setVal={setUsername} val={username}/>
+                                                        <Field type="password" placeholder="Password" required="*" setVal={setPassword} val={password}/>
+                                                        <Field type="password" placeholder="Confirm Password" required="*" setVal={setConfirmPassword} val={confirmPassword}/>
                                                     </div>
                                                 </div>
 
