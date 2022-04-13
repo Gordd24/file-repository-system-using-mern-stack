@@ -1,31 +1,9 @@
 import Field from '../page-components/Field';
 import Button from '../page-components/Button';
-import React,{useState} from 'react';
+import React,{useState, useEffect} from 'react';
 import logout from '../page-components/Logout';
+import "../css/style.css"
 function Registration(){
-
-    function register(event){
-        event.preventDefault();
-        console.log('Attempting to Sign Up...');
-
-        fetch('http://localhost:1337/cictdrive/sign_up',{
-            method: 'POST',
-            headers: {
-                'Content-Type':'application/json'
-            },
-            body: JSON.stringify({
-                fName,mName,lName,email,username,password,area,type
-            })
-        }).then(res => res.json())
-        .then(data => 
-            {
-                if(data.status=="ok"){
-                    alert('Succesfully Created!')
-                    window.location.href = '/registration';
-                }
-            }
-            )
-    }
 
     const[fName,setFName] = useState('');
     const[mName,setMName] = useState('');
@@ -37,13 +15,116 @@ function Registration(){
     const[area,setArea] = useState('');
     const[type,setType] = useState('');
 
+    const [formErrors, setFormErrors] = useState({})
+    const [isSubmit, setIsSubmit] = useState(false)
+
+    useEffect(()=>{
+        console.log(formErrors)
+        if(Object.keys(formErrors).length === 0 && isSubmit){
+            console.log(fName,mName,lName,email,username,password,confirmPassword,area,type)
+
+            fetch('http://localhost:1337/cictdrive/sign_up',{
+                method: 'POST',
+                headers: {
+                    'Content-Type':'application/json'
+                },
+                body: JSON.stringify({
+                    fName,mName,lName,email,username,password,area,type
+                })
+            }).then(res => res.json())
+            .then(data => 
+                {
+                    if(data.status==="ok"){
+                        alert('Succesfully Created!')
+                        window.location.href = '/registration';
+                    }else{
+                        console.log(data.status)
+                    }
+                }
+                )
+
+        }
+    },[formErrors])
+
+    const validate = (fName,lName,email,username,password,confirmPassword,area,type)=>{
+        const errors = {}
+        const regex =  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+
+        if (!fName){
+            errors.fName="First name is required"
+        }
+        if (!lName){
+            errors.lName="Last name is required"
+        }
+        if (!email){
+            errors.email="Email is required"
+        }else if(!regex.test(email)){
+            errors.email="This email is not valid."
+        }
+        if (!username){
+            errors.username="Username is required"
+        }
+        if (password && confirmPassword){
+            if(password !== confirmPassword){
+                errors.password="Passwords don't match"
+                errors.confirmPassword="Passwords don't match"
+            }
+            
+        }else if (!password || !confirmPassword){
+            if(!password){errors.password="Password is required"}
+            if(!confirmPassword)errors.confirmPassword="Confirm Password is required" 
+        }
+    
+        if (!area){
+            errors.area="Area is required"
+        }
+        if (!type){
+            errors.type="Account type is required"
+        }
+        return errors
+
+    }
+  
+    function register(event){
+        event.preventDefault();
+
+        setFormErrors(validate(fName,lName,email,username,password,confirmPassword,area,type))
+        setIsSubmit(true)
+        console.log('Attempting to Sign Up...');
+        
+
+            fetch('http://localhost:1337/cictdrive/sign_up',{
+            method: 'POST',
+            headers: {
+                'Content-Type':'application/json'
+            },
+            body: JSON.stringify({
+                fName,mName,lName,email,username,password,area,type
+            })
+        }).then(res => res.json())
+        .then(data => 
+            {
+                if(data.status==="ok"){
+                    alert('Succesfully Created!')
+                    window.location.href = '/registration';
+                }else{
+                    console.log(data.status)
+                }
+            }
+            )
+    }
+
+   
+
     
     return(
         <div className="h-100">
 
                 <div className="row navbar-static-top">
                     <div className="col">
-                    
+                        {/* <pre>{JSON.stringify(
+                {fName,mName,lName,email,username,password,area,type},undefined, 2
+            )}</pre> */}
                         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
                             <div className="container-fluid">
                                 <a className="navbar-brand" href="/home">CICT Drive</a>
@@ -93,7 +174,7 @@ function Registration(){
                             
                             <div className='row' style={{height: '92%'}}>
                                 <div className='col'>
-                                    <form onSubmit={register} style={{height:'100%'}}>
+                                    <form onSubmit={register}  style={{height:'100%'}}>
 
                                         <div className='row overflow-auto' style={{height: '74.5vh'}}>
                                             <div className='col'>
@@ -101,19 +182,24 @@ function Registration(){
                                                 <div className='row border rounded shadow mx-1 mt-3'>
                                                     <div className='col'>
                                                         <h5 className='border-bottom my-2 p-1'>Personal Name</h5>
-                                                        <Field type="text" placeholder="First Name" required="*" setVal={setFName} val={fName}/>
+                                                        <Field error={formErrors.fName} type="text" placeholder="First Name" required="*" setVal={setFName} val={fName}/>
                                                         <Field type="text" placeholder="Middle Name" required="" setVal={setMName} val={mName}/>
-                                                        <Field type="text" placeholder="Last Name" required="*" setVal={setLName} val={lName}/>
+                                                        <Field error={formErrors.lName} type="text" placeholder="Last Name" required="*" setVal={setLName} val={lName}/>
+                                                        
                                                     </div>
                                                 </div>
 
                                                 <div className='row border rounded mx-1 mt-3 shadow'>
                                                     <div className='col'>
                                                         <h5 className='my-2 p-1 border-bottom p-2'>Account Credentials</h5>
-                                                        <Field type="email" placeholder="Email" required="*" setVal={setEmail} val={email}/>
-                                                        <Field type="text" placeholder="Username" required="*" setVal={setUsername} val={username}/>
-                                                        <Field type="password" placeholder="Password" required="*" setVal={setPassword} val={password}/>
-                                                        <Field type="password" placeholder="Confirm Password" required="*" setVal={setConfirmPassword} val={confirmPassword}/>
+                                                        <Field error={formErrors.email} type="email" placeholder="Email" required="*" setVal={setEmail} val={email}/>
+                                                        
+                                                        <Field error={formErrors.username} type="text" placeholder="Username" required="*" setVal={setUsername} val={username}/>
+                                                        
+                                                        <Field error={formErrors.password} type="password" placeholder="Password" required="*" setVal={setPassword} val={password}/>
+                                                        
+                                                        <Field error={formErrors.confirmPassword} type="password" placeholder="Confirm Password" required="*" setVal={setConfirmPassword} val={confirmPassword}/>
+                                                        
                                                     </div>
                                                 </div>
 
@@ -135,6 +221,7 @@ function Registration(){
                                                                     <option value="9">Area 9</option>
                                                                     <option value="10">Area 10</option>
                                                                 </select>
+                                                                <div className="error">{formErrors.area}</div>
                                                             </div>
                                                         </div>
 
@@ -146,16 +233,12 @@ function Registration(){
                                                                     <option value="accreditor">Accreditor</option>
                                                                     <option value="admin">Administrator</option>
                                                                 </select>
+                                                                <div className="error">{formErrors.type}</div>
                                                             </div>
                                                         </div>
 
                                                     </div>
                                                 </div>
-
-                                               
-                                                
-                    
-
                                             </div>
                                         </div>
 
