@@ -9,6 +9,7 @@ const app = express();
 app.use(cors());
 //since we are passing json we need to tell the express we are expecting json request!
 app.use(express.json()); 
+app.use(express.urlencoded({extended: true}));
 //to use routes
 app.use('/cictdrive',routes)
 
@@ -23,8 +24,6 @@ db.on("error", console.error.bind(console, "connection error: "));
 db.once("open", function () {
   console.log("Connected successfully");
 });
-
-
 
 //start a server!
 // 1337 is the port of the server!

@@ -9,7 +9,8 @@ function Field(props){
                     {props.placeholder+' '+props.required}           
                 </label>
                 <input type={props.type} placeholder={props.placeholder} id={props.placeholder} className="form-control" value={props.val} onChange={(e)=> props.setVal(e.target.value)}/>
-                <div className="error">{props.error}</div>    
+                <div className="error">{props.error}</div>
+                <div className="error">{props.errorExist}</div>    
             </div>
         </div>
     )

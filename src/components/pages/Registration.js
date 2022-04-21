@@ -1,6 +1,6 @@
 import Field from '../page-components/Field';
 import Button from '../page-components/Button';
-import React,{useState, useEffect} from 'react';
+import React,{useState} from 'react';
 import logout from '../page-components/Logout';
 import "../css/style.css"
 function Registration(){
@@ -12,41 +12,18 @@ function Registration(){
     const[username,setUsername] = useState('');
     const[password,setPassword] = useState('');
     const[confirmPassword,setConfirmPassword] = useState('');
+    const[level,setLevel] = useState('');
+    const[phase,setPhase] = useState('');
     const[area,setArea] = useState('');
     const[type,setType] = useState('');
 
     const [formErrors, setFormErrors] = useState({})
-    const [isSubmit, setIsSubmit] = useState(false)
 
-    useEffect(()=>{
-        console.log(formErrors)
-        if(Object.keys(formErrors).length === 0 && isSubmit){
-            console.log(fName,mName,lName,email,username,password,confirmPassword,area,type)
+    const [unameExist, setUnameExist] = useState('') 
+    const [emExist, setEmExist] = useState('') 
+                       
 
-            fetch('http://localhost:1337/cictdrive/sign_up',{
-                method: 'POST',
-                headers: {
-                    'Content-Type':'application/json'
-                },
-                body: JSON.stringify({
-                    fName,mName,lName,email,username,password,area,type
-                })
-            }).then(res => res.json())
-            .then(data => 
-                {
-                    if(data.status==="ok"){
-                        alert('Succesfully Created!')
-                        window.location.href = '/registration';
-                    }else{
-                        console.log(data.status)
-                    }
-                }
-                )
-
-        }
-    },[formErrors])
-
-    const validate = (fName,lName,email,username,password,confirmPassword,area,type)=>{
+    const validate = (fName,lName,email,username,password,confirmPassword,level,phase,area,type)=>{
         const errors = {}
         const regex =  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
@@ -74,7 +51,15 @@ function Registration(){
             if(!password){errors.password="Password is required"}
             if(!confirmPassword)errors.confirmPassword="Confirm Password is required" 
         }
-    
+        
+        if (!level){
+            errors.level="Level is required"
+        }
+
+        if (!phase){
+            errors.phase="Phase is required"
+        }
+
         if (!area){
             errors.area="Area is required"
         }
@@ -82,49 +67,52 @@ function Registration(){
             errors.type="Account type is required"
         }
         return errors
-
     }
-  
     function register(event){
         event.preventDefault();
-
-        setFormErrors(validate(fName,lName,email,username,password,confirmPassword,area,type))
-        setIsSubmit(true)
-        console.log('Attempting to Sign Up...');
-        
-
-            fetch('http://localhost:1337/cictdrive/sign_up',{
-            method: 'POST',
-            headers: {
-                'Content-Type':'application/json'
-            },
-            body: JSON.stringify({
-                fName,mName,lName,email,username,password,area,type
-            })
-        }).then(res => res.json())
-        .then(data => 
-            {
-                if(data.status==="ok"){
-                    alert('Succesfully Created!')
-                    window.location.href = '/registration';
-                }else{
-                    console.log(data.status)
-                }
-            }
-            )
+        setFormErrors(validate(fName,lName,email,username,password,confirmPassword,level,phase,area,type))
+        console.log(formErrors)
+        if(Object.keys(formErrors).length === 0){
+             console.log(fName,mName,lName,email,username,password,confirmPassword,level,phase,area,type)
+             
+             fetch('http://localhost:1337/cictdrive/sign_up',{
+                 method: 'POST',
+                 headers: {
+                     'Content-Type':'application/json',
+                     
+                 },
+                 body: JSON.stringify({
+                     fName,mName,lName,email,username,password,level,phase,area,type
+                 })
+             }).then(res => res.json())
+             .then(data => 
+                 {
+                     console.log(data)
+                     if(data.status==="ok"){
+                         alert('Succesfully Created!')
+                         window.location.href = '/registration';
+                     }else{
+                         let existError = data.message;
+                         let errorSplit = existError.split('_')
+                         let usernameExist = errorSplit[0]
+                         let emailExist = errorSplit[1]
+                         setUnameExist(usernameExist)
+                         setEmExist(emailExist)
+                     }
+                 }
+                 )
+ 
+         }
+        // console.log(isSubmit)
+        // setIsSubmit(true)
     }
 
-   
-
-    
     return(
         <div className="h-100">
 
                 <div className="row navbar-static-top">
                     <div className="col">
-                        {/* <pre>{JSON.stringify(
-                {fName,mName,lName,email,username,password,area,type},undefined, 2
-            )}</pre> */}
+                        
                         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
                             <div className="container-fluid">
                                 <a className="navbar-brand" href="/home">CICT Drive</a>
@@ -192,9 +180,9 @@ function Registration(){
                                                 <div className='row border rounded mx-1 mt-3 shadow'>
                                                     <div className='col'>
                                                         <h5 className='my-2 p-1 border-bottom p-2'>Account Credentials</h5>
-                                                        <Field error={formErrors.email} type="email" placeholder="Email" required="*" setVal={setEmail} val={email}/>
+                                                        <Field error={formErrors.email} errorExist={emExist} type="email" placeholder="Email" required="*" setVal={setEmail} val={email}/>
                                                         
-                                                        <Field error={formErrors.username} type="text" placeholder="Username" required="*" setVal={setUsername} val={username}/>
+                                                        <Field error={formErrors.username} errorExist={unameExist} type="text" placeholder="Username" required="*" setVal={setUsername} val={username}/>
                                                         
                                                         <Field error={formErrors.password} type="password" placeholder="Password" required="*" setVal={setPassword} val={password}/>
                                                         
@@ -206,6 +194,31 @@ function Registration(){
                                                 <div className='row border rounded mx-1 mt-3 mb-3 shadow'>
                                                     <div className='col'>
                                                         <h5 className='my-2 p-1 border-bottom p-2'>Account Assignment</h5>
+                                                        <div className="row m-3">
+                                                            <div className="col">
+                                                                <select className="form-select" onChange={(e)=>setLevel(e.target.value)} value={level}>
+                                                                    <option>Choose Level </option>
+                                                                    <option value='1'>Level 1</option>
+                                                                    <option value="2">Level 2</option>
+                                                                    <option value="3">Level 3</option>
+                                                                    <option value="4">Level 4</option>
+                                                                </select>
+                                                                <div className="error">{formErrors.level}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="row m-3">
+                                                            <div className="col">
+                                                                <select className="form-select" onChange={(e)=>setPhase(e.target.value)} value={phase}>
+                                                                    <option>Choose Phase</option>
+                                                                    <option value='1'>Phase 1</option>
+                                                                    <option value="2">Phase 2</option>
+                                                                    <option value="3">Phase 3</option>
+                                                                    <option value="4">Phase 4</option>
+                                                                   
+                                                                </select>
+                                                                <div className="error">{formErrors.phase}</div>
+                                                            </div>
+                                                        </div>
                                                         <div className="row m-3">
                                                             <div className="col">
                                                                 <select className="form-select" onChange={(e)=>setArea(e.target.value)} value={area}>

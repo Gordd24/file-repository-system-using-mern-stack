@@ -7,10 +7,18 @@ const router = express.Router();
 //import Schemas
 const UserModel = require('../models/user.js')
 
+
 //specify the routes!
 
 //registration
 router.post("/sign_up", async (request, response) =>{
+  
+  const userExist = await UserModel.findOne({
+    username: request.body.username
+  })
+  const emailExist = await UserModel.findOne({
+    email: request.body.email
+  })
   
     try{
       const newPassword = await  bcrypt.hash(request.body.password,10)
@@ -22,15 +30,32 @@ router.post("/sign_up", async (request, response) =>{
         username: request.body.username,
         password: newPassword,
         //confirm_password: request.body.confirm_password,
+        level: request.body.level,
+        phase: request.body.phase,
         area: request.body.area,
         type: request.body.type,
       })
       response.json({status: 'ok'})
       
     }catch(err){
+      if(userExist|| emailExist){
+          let userMsg =""
+          let emailMsg =""
+          if(userExist){
+             userMsg ="Username already exists."    
+          }
+          if(emailExist){
+            emailMsg = "Email already exists."
+          }
+          response.status(409).json({message: userMsg + "_" + emailMsg})
+        }else{
+          response.json({status: err, error:'something wrong'})
+        }
       console.log(err)
-      response.json({status: err, error:'something wrong'})
+      
     }
+  
+   
   })
 
 
