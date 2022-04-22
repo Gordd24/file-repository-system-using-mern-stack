@@ -3,10 +3,13 @@ const bcrypt = require('bcryptjs')
 //for routing use router class!
 const router = express.Router();
 
+//for files
+const fs = require('fs');
 
 //import Schemas
-const UserModel = require('../models/user.js')
-
+const UserModel = require('../models/user.js');
+const LevelModel = require('../models/level.js');
+const { application } = require('express');
 
 //specify the routes!
 
@@ -82,6 +85,74 @@ router.post("/sign_up", async (request, response) =>{
           return response.json({status:'user-not-found'})
     }
   });
+
+
+  //create level
+  // should create the directory.
+  // Shall be able to filter if the level is at its maximum.
+  router.post('/create-level', async (request, response) => {
+
+      LevelModel.find({}).then(data => 
+        {
+          if(data.length<4){
+            var dir = './files/'+request.body.level;
+
+            if (!fs.existsSync(dir)){
+                fs.mkdirSync(dir);
+      
+                try{
+                    LevelModel.create({
+                    level: []
+                  })
+                  response.json({level: request.body.level})
+                  
+                }catch(err){
+                  console.log(err)
+                  response.json({status: err, error:'something wrong'})
+                }
+          
+            }
+
+          }else{
+              response.json({level:'Maximum'})
+          }
+        }
+      );
+
+     
+
+     
+
+      // await LevelModel.findOneAndUpdate(
+      //   { _id: '626072d5d97cb44ff44620d3'}, 
+      //   { $push: {'level':[]}}
+      // );
+      
+  });
+
+  router.get('/load-levels', async (request, response) => {
+
+      // LevelModel.count({}, function( err, count){
+      //   console.log( "Number of users:", count );
+      // })
+
+      let newArr = []
+      LevelModel.find({}).then(data => 
+        {
+          for(let i = 0; i < data.length; i++){
+            newArr.push(data[i].id)
+          }
+          response.json({level: newArr})
+        }
+      );
+      
+
+      
+    
+  });
+
+
+  // router.get('/load');
 
 
   module.exports = router;

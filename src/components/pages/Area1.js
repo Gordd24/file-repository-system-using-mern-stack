@@ -1,66 +1,6 @@
-import Level from '../page-components/Level'
 import logout from '../page-components/Logout';
-import React,{useState,useEffect} from 'react';
 
-
-function Home(){
-
-    const[levelComps,setLevelComps] = useState([])
-    const[levels,setLevels] = useState([])
-    useEffect(
-        ()=>{
-
-            if(levels.length!==0){
-                console.log('level length on if',levels.length)
-                console.log('level comps on if',levelComps)
-                let levelHolder = [];
-                for(let i=levelHolder.length+1;i<levels.length+1;i++){
-                     levelHolder.push(<Level desc={'All files relevant to level '+(i)+' were placed in this directory.'} level={i} key={i}/>);
-                }
-                setLevelComps(levelHolder);
-            }else{
-                fetch('http://localhost:1337/cictdrive/load-levels').then(data => data.json())
-                .then(data => {
-                    if(data.level.length!==0){
-                    setLevels(data.level)
-                    console.log('data-level',data.level)
-                    console.log('data-level length',data.level.length)
-                    console.log('level on else load',levels)
-                    }
-                })
-            }
-        }
-    ,[levels])
-
-    function createLevel() {
-        fetch('http://localhost:1337/cictdrive/create-level',{
-            method: 'POST',
-            headers: {
-                'Content-Type':'application/json'
-            },
-            body: JSON.stringify({
-                'level':levels.length+1
-            })
-        }).then(data => data.json())
-        .then(data => {
-            if(data.level === "Maximum"){
-                alert('Level creation has reached its maximum limit!')
-            }else{
-                alert('Level '+data.level+' was successfully created!')
-                setLevels([...levels,data.level])
-                console.log(data.level)
-                console.log(levels)
-            }
-            
-        })
-
-       
-
-    }
-
-   
-
-   
+function Area1(){
     
     return(
         <div className="h-100">
@@ -98,10 +38,10 @@ function Home(){
                         </div>
                     </div>
 
-                    <div className="row m-2">
+                    <div className="row m-2 shadow-lg">
                         <div className="col d-flex flex-column">
 
-                            <div className="row border p-1">
+                            <div className="row border p-1 shadow">
                                 <div className="col p-1">
                                     directory
                                 </div>
@@ -113,42 +53,66 @@ function Home(){
                                 <div className="col-2 shadow d-none d-lg-block">
                                     <div className='row bg-dark text-light align-items-center' style={{ height: '7.5%'}}>
                                         <div className='col'>
-                                            Accreditation Level
+                                            Area 1
                                         </div>
                                     </div>
 
                                     <div className='row text-light justify-content-center p-2' style={{ height: '92.5%'}}>
                                         <div className='col-12'>
-                                            <button className='btn-dark form-control my-2' onClick={createLevel}>Create Level</button>
+
+                                            <button className='btn border-primary form-control my-2'>Create Folder</button>
+
+                                            <button className='btn border-warning form-control my-2'>Upload File</button>
                                         </div>
                                     </div>
 
                                 </div>
 
-                                <div className="col-12 col-lg-10">
+                                <div className="col-12 col-lg-10 p-2">
 
-                                    {/* <div className="row bg-primary" style={{ height: '10vh'}}> */}
-                                    <div className="row shadow d-flex d-xs-block d-sm-block d-lg-none d-xl-none align-items-center" style={{ height: '8vh'}}>
-                                        <div className="col-12">
-
-                                            <div className="row justify-content-center">
-                                                <div className="col-6 col-sm-4">
-                                                    <button className='btn-dark form-control shadow'>Create Level</button>
-                                                </div>
+                                    <div className="row text-center mb-1 d-xs-block d-sm-block d-lg-none d-xl-none">
+                                        <div className="col-4 col-md-2">
+                                            <div className="dropdown border rounded shadow bg-dark">
+                                                <a className="nav-link text-light" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    Area 1
+                                                </a>
+                                                <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
+                                                    <li className='dropdown-item'>Create Folder</li>
+                                                    <li className='dropdown-item'>Upload File</li>
+                                                </ul>
                                             </div>
-                                            
-
-                                            
                                         </div>
                                     </div>
 
-                                    <div className="row justify-content-center p-3 overflow-auto" style={{ height: '78vh'}}>
-                                        {levelComps}
+                                    <div className="row">
+                                        <div className="col">
+                                            <table className="table shadow">
+                                                <thead className="thead-dark bg-dark text-light">
+                                                    <tr>
+                                                    <th scope="col">Name</th>
+                                                    <th scope="col">Type</th>
+                                                    <th scope="col"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Sample.txt</td>
+                                                        <td>Text File</td>
+                                                        <td>
+                                                            <button className="btn-secondary mx-1">Move</button>
+                                                            <button className="btn-secondary mx-1">Delete</button>
+                                                            <button className="btn-secondary mx-1">Download</button>
+                                                            <button className="btn-secondary mx-1">Open</button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>                            
+                                            </table>
+
+                                        </div>
                                     </div>
 
                                 </div>
                             </div>
-
                         </div>
                     </div>
 
@@ -158,4 +122,4 @@ function Home(){
 }
 
 
-export default Home;
+export default Area1;
