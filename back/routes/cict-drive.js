@@ -103,9 +103,12 @@ router.post("/sign_up", async (request, response) =>{
                 try{
                     LevelModel.create({
                     level: []
+                  },(err,doc)=>{
+                    if(!err){
+                      response.json({level: doc.id})
+                    }
                   })
-                  response.json({level: request.body.level})
-                  
+
                 }catch(err){
                   console.log(err)
                   response.json({status: err, error:'something wrong'})
@@ -132,10 +135,6 @@ router.post("/sign_up", async (request, response) =>{
 
   router.get('/load-levels', async (request, response) => {
 
-      // LevelModel.count({}, function( err, count){
-      //   console.log( "Number of users:", count );
-      // })
-
       let newArr = []
       LevelModel.find({}).then(data => 
         {
@@ -145,14 +144,85 @@ router.post("/sign_up", async (request, response) =>{
           response.json({level: newArr})
         }
       );
-      
-
-      
     
   });
 
 
-  // router.get('/load');
+  //create level
+  // should create the directory.
+  router.post('/create-phase', async (request, response) => {
+
+            var dir = './files/'+request.body.level+'/'+request.body.phase;
+
+            if (!fs.existsSync(dir)){
+                fs.mkdirSync(dir);
+                try{
+                  LevelModel.find({}).then(async data => {
+                    let newArr = []
+                    for(let i = 0; i < data.length; i++){
+                      newArr.push(data[i].id)
+                    }
+                      let levelId = newArr[request.body.level-1]
+                      let doc = await LevelModel.findOneAndUpdate(
+                        { _id: levelId}, 
+                        { $push: {'level':[]}},
+                        {new:true});
+
+                      response.json({'phase':doc.level.length-1})
+
+                      
+                      let areaObj = {}
+                      let phaseId = 'level.'+(doc.level.length-1);
+                      areaObj[phaseId]=[]
+
+                      for(i=0;i<10;i++){
+
+                          var dir = './files/'+request.body.level+'/'+request.body.phase+'/'+(i+1);
+                          if (!fs.existsSync(dir)){
+                              fs.mkdirSync(dir);
+                              await LevelModel.findOneAndUpdate(
+                              { _id: levelId}, 
+                              { $push: areaObj},
+                              {new:true},);
+                          }
+                      }
+                   
+                    
+
+                  })
+                  
+                 
+                }catch(err){
+                  console.log(err)
+                  response.json({status: err, error:'something wrong'})
+                }
+          
+          }
+
+  })
+
+  router.post('/load-phases', async (request, response) => {
+
+    LevelModel.find({}).then(data => {
+      let newArr = []
+      for(let i = 0; i < data.length; i++){
+        newArr.push(data[i].id)
+      }
+      let levelId = newArr[request.body.level-1];
+      LevelModel.findOne({_id:levelId},function (err, doc){
+
+            let newArr = []
+            for(let i = 0; i < doc.level.length; i++){
+              newArr.push(i)
+            }
+            response.json({phases: newArr})    
+
+      })
+    
+    }) 
+
+   
+});
 
 
   module.exports = router;
