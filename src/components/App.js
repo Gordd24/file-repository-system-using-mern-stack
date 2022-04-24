@@ -3,6 +3,8 @@ import SignIn from './pages/SignIn';
 import Home from './pages/Home';
 import Level from './pages/Level';
 import Phase from './pages/Phase';
+import Area from './pages/Area';
+import Parameter from './pages/Parameter';
 import Registration from './pages/Registration';
 import { BrowserRouter, Route, Routes} from 'react-router-dom';
 
@@ -15,6 +17,8 @@ function App() {
             <Route path='/home' element={<Home/>}></Route>
             <Route path='/home/level/:id' element={<Level/>}></Route>
             <Route path='/home/level/:id/:phaseId' element={<Phase/>}></Route>
+            <Route path='/home/level/:id/:phaseId/:areaId' element={<Area/>}></Route>
+            <Route path='/home/level/:id/:phaseId/:areaId/:paramId' element={<Parameter/>}></Route>
             <Route path='/registration' element={<Registration/>}></Route>
           </Routes>
         </BrowserRouter>

@@ -1,15 +1,25 @@
 import logout from '../page-components/Logout';
 import React,{useState,useEffect} from 'react';
 import { useParams } from 'react-router-dom';
+import AreaCard from '../page-components/AreaCard'
 
 
-function Level(props){
+function Phase(props){
 
     const params = useParams()
-    useEffect(()=>{
-        console.log(params.phaseId)
+    const[areaComps,setAreaComps] = useState([])
+    const description = []
 
-    },[])
+    useEffect(
+        ()=>{
+                let areaHolder = [];
+                for(let i=1;i<11;i++){
+                     areaHolder.push(<AreaCard desc={description[i-1]} level={params.id} phase={params.phaseId} area={i} key={i}/>);
+                }
+                setAreaComps(areaHolder);
+
+        }
+    ,[])
 
 
     return(
@@ -84,7 +94,7 @@ function Level(props){
                                     </div>
 
                                     <div className="row justify-content-center p-3 overflow-auto" style={{ height: '78vh'}}>
-                                        {params.phaseId}
+                                        {areaComps}
 
                                     </div>
 
@@ -100,4 +110,4 @@ function Level(props){
 }
 
 
-export default Level;
+export default Phase;

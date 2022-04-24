@@ -148,7 +148,7 @@ router.post("/sign_up", async (request, response) =>{
   });
 
 
-  //create level
+  //create phase
   // should create the directory.
   router.post('/create-phase', async (request, response) => {
 
@@ -224,5 +224,67 @@ router.post("/sign_up", async (request, response) =>{
    
 });
 
+
+  //create param
+  // should create the directory.
+  router.post('/create-param', async (request, response) => {
+    console.log(request.body.parameter);
+
+    var dir = './files/'+request.body.level+'/'+request.body.phase+'/'+request.body.area+'/'+request.body.parameter;
+    console.log(dir)
+  
+    if (!fs.existsSync(dir)){
+        fs.mkdirSync(dir);
+        try{
+          LevelModel.find({}).then(async data => {
+            let newArr = []
+            for(let i = 0; i < data.length; i++){
+              newArr.push(data[i].id)
+            }
+            let levelId = newArr[request.body.level-1]
+
+
+            let paramObj = {}
+            let areaId = 'level.'+(request.body.phase-1)+'.'+(request.body.area-1);
+            paramObj[areaId]='P-'+request.body.parameter
+
+            let doc = await LevelModel.findOneAndUpdate(
+            { _id: levelId}, 
+            { $push: paramObj},
+            {new:true});
+            let parameter = doc.level[request.body.phase-1][request.body.area-1].length-1
+            response.json({'parameter':parameter})
+
+            
+          })
+          
+         
+        }catch(err){
+          console.log(err)
+          response.json({status: err, error:'something wrong'})
+        }
+  
+  }
+
+})
+
+
+router.post('/load-params', async (request, response) => {
+
+  LevelModel.find({}).then(data => {
+    let newArr = []
+    for(let i = 0; i < data.length; i++){
+      newArr.push(data[i].id)
+    }
+    let levelId = newArr[request.body.level-1];
+    
+    LevelModel.findOne({_id:levelId},function (err, doc){
+          response.json({parameter: doc.level[request.body.phase-1][request.body.area-1]})    
+    })
+  
+  }) 
+
+ 
+});
 
   module.exports = router;

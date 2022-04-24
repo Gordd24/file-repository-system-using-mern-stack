@@ -1,69 +1,66 @@
 import logout from '../page-components/Logout';
-import PhaseCard from '../page-components/PhaseCard';
+import ParamCard from '../page-components/ParamCard';
 import React,{useState,useEffect} from 'react';
 import { useParams } from 'react-router-dom';
 
 
-function Level(props){
+function Area(props){
 
     const params = useParams()
+    const[parameterComps,setParameterComps] = useState([])
+    const[parameters,setParameters] = useState([])
 
-    const[phaseComps,setPhaseComps] = useState([])
-    const[phases,setPhases] = useState([])
     useEffect(()=>{
-        console.log('eyo');
-        console.log(params.id)
-        console.log(phases)
-        setPhases([]);
 
-    },[])
-
-
-    useEffect(
-        ()=>{
-            // console.log('phases:',phases);
-            // console.log('phases length:',phases.length);
-            if(phases.length!==0){
-                let phaseHolder = [];
-                for(let i=phaseHolder.length+1;i<phases.length+1;i++){
-                     phaseHolder.push(<PhaseCard desc={'Phase '+(i)} level={params.id} phase={i} key={phases[i-1]}/>);
-                }
-                setPhaseComps(phaseHolder);
-            }else{
-                fetch('http://localhost:1337/cictdrive/load-phases',{
-                    method:'POST',
-                    headers:{
-                        'Content-Type':'application/json'
-                    },
-                    body: JSON.stringify({
-                        'level':params.id,
-                    })
-                }).then(data => data.json())
-                .then(data => {
-                    if(data.phases.length!==0){
-                        console.log(data.phases)
-                        console.log('got in');
-                        setPhases(data.phases)
-                    }
-                })
+        if(parameters.length!==0){
+            let parameterHolder = [];
+            for(let i=parameterHolder.length+1;i<parameters.length+1;i++){
+                 parameterHolder.push(<ParamCard desc={'Parameter '+(i)} parameter={i} area={params.areaId} level={params.id} phase={params.phaseId} key={i}/>);
             }
+            setParameterComps(parameterHolder);
+        }else{
+            fetch('http://localhost:1337/cictdrive/load-params',{
+                method:'POST',
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                body: JSON.stringify({
+                    'level':params.id,
+                    'phase':params.phaseId,
+                    'area':params.areaId,
+                })
+            }).then(data => data.json())
+            .then(data => {
+                if(data.parameter.length!==0){
+                console.log('loads',data.parameter)
+                setParameters(data.parameter)
+                }
+          
+            })
         }
-    ,[phases])
 
-    function createPhase() {
+    },[parameters])
 
-        fetch('http://localhost:1337/cictdrive/create-phase',{
+    function createParam(){
+        fetch('http://localhost:1337/cictdrive/create-param',{
             method: 'POST',
             headers: {
                 'Content-Type':'application/json'
             },
             body: JSON.stringify({
                 'level':params.id,
-                'phase':phases.length+1
+                'phase':params.phaseId,
+                'area':params.areaId,
+                'parameter':parameters.length+1
             })
         }).then(data => data.json())
         .then(data => {
-            setPhases([...phases,data.phase])
+
+                console.log('create',data)
+                setParameters([...parameters,data.parameter])
+                console.log(data.parameter)
+           
+            
         })
     }
 
@@ -118,13 +115,13 @@ function Level(props){
                                 <div className="col-2 shadow d-none d-lg-block">
                                     <div className='row bg-dark text-light align-items-center' style={{ height: '7.5%'}}>
                                         <div className='col'>
-                                            Level Phases
+                                            Area Paramaters
                                         </div>
                                     </div>
 
                                     <div className='row text-light justify-content-center p-2' style={{ height: '92.5%'}}>
                                         <div className='col-12'>
-                                            <button className='btn-dark form-control my-2' onClick={createPhase}>Create Phase</button>
+                                            <button className='btn-dark form-control my-2' onClick={createParam}>Create Parameter</button>
                                         </div>
                                     </div>
 
@@ -145,7 +142,7 @@ function Level(props){
                                     </div>
 
                                     <div className="row justify-content-center p-3 overflow-auto" style={{ height: '78vh'}}>
-                                        {phaseComps}
+                                        {parameterComps}
 
                                     </div>
 
@@ -161,4 +158,4 @@ function Level(props){
 }
 
 
-export default Level;
+export default Area;
