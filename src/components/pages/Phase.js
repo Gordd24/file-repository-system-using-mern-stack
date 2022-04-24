@@ -63,7 +63,9 @@ function Phase(props){
 
                             <div className="row border p-1">
                                 <div className="col p-1">
-                                    directory
+                                    <a href='/home' className='mx-2'>Levels</a> 
+                                    <a href={'/home/level/'+params.id} className='mx-2'>Level{' '+params.id}</a> 
+                                    <a href={'/home/level/'+params.id+'/'+params.phaseId} className='mx-2'>Phase{' '+params.phaseId}</a> 
                                 </div>
                             </div>
 

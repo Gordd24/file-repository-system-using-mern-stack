@@ -97,7 +97,7 @@ function Home(){
 
                             <div className="row border p-1">
                                 <div className="col p-1">
-                                    directory
+                                    <a href='/home'>Levels</a> 
                                 </div>
                             </div>
 
