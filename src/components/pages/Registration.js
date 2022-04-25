@@ -44,37 +44,33 @@ function Registration(){
     
 
         if(levels.length !== 0){
+            
             if(level!==''){
-                if(level === levels[0]._id){
-                    phases = levels[0].level
-                }else if(level === levels[1]._id){
-                    phases= levels[1].level
-                }else if(level === level[2]._id){
-                    phases = levels[2].level
+                
+                for (let i = 0; i <level;i++){      
+                    phases = levels[i].level
                 }
-                else if(level === level[3]._id){
-                    phases = levels[3].level
-                }
+                
+                // if(level === levels[0].value){
+                //     phases = levels[0].level
+                // }else if(level === levels[1].value){
+                //     phases= levels[1].level
+                // }else if(level === levels[2].value){
+                //     phases = levels[2].level
+                // }else if(level === levels[3].value){
+                //     phases = levels[3].level
+                // }else{
+
+                // }
             }
-            else{
-                console.log('no level selected yet')
-            }
+            // else{
+            //     console.log('no level selected yet')
+            // }
             
         }else{
             console.log('loading')
-      
         }
-        // console.log(level)
         
-        // if(level!==''){
-        //     if(phases !== null){
-        //             for(let i = 1; i<=phases.length; i++  ){
-        //                 console.log(i)
-        //             }
-                
-        //     }
-            
-        // }
 
         function renderPhase(){
             
@@ -144,7 +140,7 @@ function Registration(){
         setFormErrors(validate(fName,lName,email,username,password,confirmPassword,level,phase,area,type))
         console.log(formErrors)
         if(Object.keys(formErrors).length === 0){
-             console.log(fName,mName,lName,email,username,password,confirmPassword,level,phase,area,type)
+            //  console.log(fName,mName,lName,email,username,password,confirmPassword,level,phase,area,type)
              
              fetch('http://localhost:1337/cictdrive/sign_up',{
                  method: 'POST',
@@ -164,11 +160,17 @@ function Registration(){
                          window.location.href = '/registration';
                      }else{
                          let existError = data.message;
-                         let errorSplit = existError.split('_')
-                         let usernameExist = errorSplit[0]
-                         let emailExist = errorSplit[1]
-                         setUnameExist(usernameExist)
-                         setEmExist(emailExist)
+                         if(existError !== undefined){
+                             if(existError.includes('_') ){
+                                let errorSplit = existError.split('_')
+                            let usernameExist = errorSplit[0]
+                            let emailExist = errorSplit[1]
+                            setUnameExist(usernameExist)
+                            setEmExist(emailExist)
+                             }
+                            
+                         }
+                         
                      }
                  }
                  )
