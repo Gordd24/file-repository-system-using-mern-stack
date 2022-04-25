@@ -1,8 +1,10 @@
 import Field from '../page-components/Field';
 import Button from '../page-components/Button';
-import React,{useState} from 'react';
+import React,{useState,useEffect} from 'react';
 import logout from '../page-components/Logout';
 import "../css/style.css"
+import axios from 'axios'
+
 function Registration(){
 
     const[fName,setFName] = useState('');
@@ -17,11 +19,78 @@ function Registration(){
     const[area,setArea] = useState('');
     const[type,setType] = useState('');
 
+    // container current selected value of level
+    
+
+
     const [formErrors, setFormErrors] = useState({})
 
     const [unameExist, setUnameExist] = useState('') 
     const [emExist, setEmExist] = useState('') 
-                       
+    
+    const [levels, setLevels] = useState([])
+
+   
+    const levelUrl = 'http://localhost:1337/cictdrive/levels'
+        
+    let phases = null
+        useEffect(()=>{
+            axios.get(levelUrl)
+            .then(response => {
+            setLevels(response.data)
+            console.log(response.data)
+        })
+        },[levelUrl])
+    
+
+        if(levels.length !== 0){
+            if(level!==''){
+                if(level === levels[0]._id){
+                    phases = levels[0].level
+                }else if(level === levels[1]._id){
+                    phases= levels[1].level
+                }else if(level === level[2]._id){
+                    phases = levels[2].level
+                }
+                else if(level === level[3]._id){
+                    phases = levels[3].level
+                }
+            }
+            else{
+                console.log('no level selected yet')
+            }
+            
+        }else{
+            console.log('loading')
+      
+        }
+        // console.log(level)
+        
+        // if(level!==''){
+        //     if(phases !== null){
+        //             for(let i = 1; i<=phases.length; i++  ){
+        //                 console.log(i)
+        //             }
+                
+        //     }
+            
+        // }
+
+        function renderPhase(){
+            
+            if(level!==''){
+                if(phases !== null){
+                    let num =0 
+                    return(
+                        phases.map((phasess)=>(
+                            <option value={num++} key={num} >Phase {num} {phasess}</option>
+                        ))
+                    )
+                }
+                
+            }
+        }
+        
 
     const validate = (fName,lName,email,username,password,confirmPassword,level,phase,area,type)=>{
         const errors = {}
@@ -68,6 +137,8 @@ function Registration(){
         }
         return errors
     }
+
+
     function register(event){
         event.preventDefault();
         setFormErrors(validate(fName,lName,email,username,password,confirmPassword,level,phase,area,type))
@@ -198,10 +269,9 @@ function Registration(){
                                                             <div className="col">
                                                                 <select className="form-select" onChange={(e)=>setLevel(e.target.value)} value={level}>
                                                                     <option>Choose Level </option>
-                                                                    <option value='1'>Level 1</option>
-                                                                    <option value="2">Level 2</option>
-                                                                    <option value="3">Level 3</option>
-                                                                    <option value="4">Level 4</option>
+                                                                    {levels.map((getLevel)=>(
+                                                                        <option key = {getLevel._id} value = {getLevel.value}>Level {getLevel.value}</option>
+                                                                    ))}
                                                                 </select>
                                                                 <div className="error">{formErrors.level}</div>
                                                             </div>
@@ -210,10 +280,7 @@ function Registration(){
                                                             <div className="col">
                                                                 <select className="form-select" onChange={(e)=>setPhase(e.target.value)} value={phase}>
                                                                     <option>Choose Phase</option>
-                                                                    <option value='1'>Phase 1</option>
-                                                                    <option value="2">Phase 2</option>
-                                                                    <option value="3">Phase 3</option>
-                                                                    <option value="4">Phase 4</option>
+                                                                    {renderPhase()}
                                                                    
                                                                 </select>
                                                                 <div className="error">{formErrors.phase}</div>

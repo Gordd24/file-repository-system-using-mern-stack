@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
 
 //Create a schema
-
 const LevelSchema = new mongoose.Schema({
-    level:{type : Array , "default" : []}
+    
+    level:{type : Array , "default" : []},
+    value: {type: Number},
 })
 
 

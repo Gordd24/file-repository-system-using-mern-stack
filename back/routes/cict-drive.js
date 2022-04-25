@@ -51,7 +51,11 @@ router.post("/sign_up", async (request, response) =>{
             emailMsg = "Email already exists."
           }
           response.status(409).json({message: userMsg + "_" + emailMsg})
-        }else{
+        }
+        // else if(request.body.password !== request.body.confirmPassword){
+        //   response.status(409).json({message: 'passwords dont matches'})
+        // }
+        else{
           response.json({status: err, error:'something wrong'})
         }
       console.log(err)
@@ -94,6 +98,10 @@ router.post("/sign_up", async (request, response) =>{
 
       LevelModel.find({}).then(data => 
         {
+          let levelValue = 1
+          for (let i = 0; i<data.length; i++){
+              levelValue = data.length + 1
+          }
           if(data.length<4){
             var dir = './files/'+request.body.level;
 
@@ -102,7 +110,8 @@ router.post("/sign_up", async (request, response) =>{
       
                 try{
                     LevelModel.create({
-                    level: []
+                    level: [],
+                    value:  levelValue
                   },(err,doc)=>{
                     if(!err){
                       response.json({level: doc.id})
@@ -147,6 +156,16 @@ router.post("/sign_up", async (request, response) =>{
     
   });
 
+  router.get('/levels', async (request, response)=>{
+    await LevelModel.find({})
+     .then((data)=>{
+       console.log('Data: ', data)
+       response.json(data)
+     })
+     .catch((error)=>{
+       console.log("Error: ", error)
+     })
+   })
 
   //create phase
   // should create the directory.
