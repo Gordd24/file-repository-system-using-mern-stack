@@ -49,7 +49,7 @@ function Registration(){
                     phases = levels[0].level
                 }else if(level === levels[1]._id){
                     phases= levels[1].level
-                }else if(level === level[2]._id){
+                }else if(level === levels[2]._id){
                     phases = levels[2].level
                 }
                 else if(level === level[3]._id){
