@@ -5,6 +5,7 @@ import Level from './pages/Level';
 import Phase from './pages/Phase';
 import Area from './pages/Area';
 import Parameter from './pages/Parameter';
+import Test from './pages/test';
 import Registration from './pages/Registration';
 import { BrowserRouter, Route, Routes} from 'react-router-dom';
 
@@ -19,6 +20,7 @@ function App() {
             <Route path='/home/level/:id/:phaseId' element={<Phase/>}></Route>
             <Route path='/home/level/:id/:phaseId/:areaId' element={<Area/>}></Route>
             <Route path='/home/level/:id/:phaseId/:areaId/:paramId' element={<Parameter/>}></Route>
+            <Route path='/test' element={<Test/>}></Route>
             <Route path='/registration' element={<Registration/>}></Route>
           </Routes>
         </BrowserRouter>

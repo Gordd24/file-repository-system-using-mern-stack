@@ -5,11 +5,18 @@ const router = express.Router();
 
 //for files
 const fs = require('fs');
+//middleware for uploading files, files will be accesible by req.files.filename
+const fileupload = require("express-fileupload");
+
+//for files
+router.use(fileupload());
+router.use(express.static("files"));
 
 //import Schemas
 const UserModel = require('../models/user.js');
 const LevelModel = require('../models/level.js');
-const { application } = require('express');
+const FileModel = require('../models/file.js');
+const { json } = require('express');
 
 //specify the routes!
 
@@ -60,10 +67,8 @@ router.post("/sign_up", async (request, response) =>{
         }
       console.log(err)
       
-    }
-  
-   
-  })
+  }
+})
 
 
 //sign_in
@@ -90,57 +95,61 @@ router.post("/sign_up", async (request, response) =>{
     }
   });
 
-
   //create level
   // should create the directory.
   // Shall be able to filter if the level is at its maximum.
   router.post('/create-level', async (request, response) => {
 
-      LevelModel.find({}).then(data => 
-        {
-          let levelValue = 1
-          for (let i = 0; i<data.length; i++){
-              levelValue = data.length + 1
-          }
-          if(data.length<4){
-            var dir = './files/'+request.body.level;
-
-            if (!fs.existsSync(dir)){
-                fs.mkdirSync(dir);
-      
-                try{
-                    LevelModel.create({
-                    level: [],
-                    value:  levelValue
-                  },(err,doc)=>{
-                    if(!err){
-                      response.json({level: doc.id})
-                    }
-                  })
-
-                }catch(err){
-                  console.log(err)
-                  response.json({status: err, error:'something wrong'})
-                }
-          
-            }
-
-          }else{
-              response.json({level:'Maximum'})
-          }
+    LevelModel.find({}).then(data => 
+      {
+        let levelValue = 1
+        for (let i = 0; i<data.length; i++){
+            levelValue = data.length + 1
         }
-      );
+        if(data.length<4){
+          var dir = './files/'+request.body.level;
 
-     
+          if (!fs.existsSync(dir)){
+              fs.mkdirSync(dir);
+    
+              try{
+                  LevelModel.create({
+                  level: [],
+                  value:  levelValue
+                },(err,doc)=>{
+                  if(!err){
+                    response.json({level: doc.id})
+                  }
+                })
 
-     
+              }catch(err){
+                console.log(err)
+                response.json({status: err, error:'something wrong'})
+              }
+        
+          }
 
-      // await LevelModel.findOneAndUpdate(
-      //   { _id: '626072d5d97cb44ff44620d3'}, 
-      //   { $push: {'level':[]}}
-      // );
-      
-  });
+        }else{
+            response.json({level:'Maximum'})
+        }
+      }
+    );
+
+    
+});
+
+router.get('/levels', async (request, response)=>{
+  await LevelModel.find({})
+   .then((data)=>{
+     console.log('Data: ', data)
+     response.json(data)
+   })
+   .catch((error)=>{
+     console.log("Error: ", error)
+   })
+ })
+
+
 
   router.get('/load-levels', async (request, response) => {
 
@@ -156,16 +165,6 @@ router.post("/sign_up", async (request, response) =>{
     
   });
 
-  router.get('/levels', async (request, response)=>{
-    await LevelModel.find({})
-     .then((data)=>{
-       console.log('Data: ', data)
-       response.json(data)
-     })
-     .catch((error)=>{
-       console.log("Error: ", error)
-     })
-   })
 
   //create phase
   // should create the directory.
@@ -304,6 +303,95 @@ router.post('/load-params', async (request, response) => {
   }) 
 
  
+});
+
+
+router.post("/upload-file", (req, res) => {
+  const newpath = "./tmpfiles/";
+  const files = req.files.files;
+  const doc = req.files.document;
+  const docname = doc.name
+  console.log(files)
+  // console.log(filename)
+  // console.log(docname)
+
+  doc.mv(`${newpath}${docname}`, (err) => {
+    if (err) {
+      res.status(500).send({ message: "File upload failed", code: 200 });
+    }else{
+      const fs = require("fs");
+      fs.readFile(newpath+docname, (error, data) => {
+          if(error) {
+              throw error;
+          }
+          const blobStr = data.toString();
+          blobData = JSON.parse(blobStr)
+          dir = './files/'+blobData.dir+'/';
+            
+          console.log('dir = '+dir)
+
+          if(typeof(files)=='object'&&files.length>0){
+              files.forEach(function (item) {
+                console.log(item.name)
+                item.mv(`${dir}${item.name}`, (err) => {
+                  if (err) {
+                    res.status(500).send({ message: "File upload failed", code: 200 });
+                  }else{
+                    FileModel.create({
+                      filename:item.name,
+                      directory:blobData.dir,
+                      type:item.mimetype
+                    })
+                  }
+                  
+                });
+              }); 
+              console.log('okeh')
+              res.status(200).send({ message: "File/s Load", code: 200 });
+          }else if(typeof(files)=='object'){
+              console.log(files.name)
+              files.mv(`${dir}${files.name}`, (err) => {
+                if (err) {
+                  res.status(500).send({ message: "File upload failed", code: 200 });
+                }else{
+                  FileModel.create({
+                    filename:files.name,
+                    directory:blobData.dir,
+                    type:files.mimetype
+                  })
+                }
+                res.status(200).send({ message: "File/s Uploaded", code: 200 });
+              });
+             
+          }
+
+
+      });
+    }
+    
+  });
+
+  
+});
+
+
+router.post("/load-files", (req, res) => {
+  
+      FileModel.find({directory:req.body.dir}).then(data => 
+        {
+
+          let filesObj = {}
+         
+         
+
+          for(let i = 0; i < data.length; i++){
+            let fileId = data[i].id;
+            filesObj[i]={filename:data[i].filename,directory:data[i].directory,type:data[i].type}
+          }
+          res.json(filesObj)
+        }
+      );
+  
 });
 
   module.exports = router;

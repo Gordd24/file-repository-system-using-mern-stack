@@ -1,19 +1,99 @@
 import logout from '../page-components/Logout';
 import React,{useState,useEffect} from 'react';
 import { useParams } from 'react-router-dom';
-import AreaCard from '../page-components/AreaCard'
 
 
 function Parameter(props){
 
     const params = useParams()
 
+    const [file, setFile] = useState('');
+    //for displaying list of files
+    const [files,setFiles] = useState([]);
+
+    const [uploadChange,setUploadChange] = useState(1)
+
+    useEffect(
+        ()=>{
+
+            fetch('http://localhost:1337/cictdrive/load-files',
+            {
+                method:'POST',
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                body: JSON.stringify({
+                    'dir':params.id+'/'+params.phaseId+'/'+params.areaId+'/'+params.paramId
+            })
+            }).then(data => data.json())
+            .then(data => {
+
+                let rows = []
+                for (const item in data) {
+                    let row = <tr key={item}>
+                                <th scope="row">{data[item].filename}</th>
+                                <td>{data[item].type}</td>
+                                <td>action</td>
+                            </tr>
+                    rows.push(row)
+                }
+                
+                
+                setFiles(rows)
+            })
+
+            
+        }
+    ,[uploadChange])
+
+    const saveFile = (e) => {
+    setFile(e.target.files);
+    };
+
+    const handleUpload = (event) => {
+        event.preventDefault();
+        console.log(file);
+        const obj = {
+          dir: params.id+'/'+params.phaseId+'/'+params.areaId+'/'+params.paramId
+        };
+
+        const json = JSON.stringify(obj);
+        const blob = new Blob([json], {
+          type: 'application/json'
+        });
+
+
+        const data = new FormData();
+        for (var x = 0; x < file.length; x++) {
+            data.append("files", file[x]);
+          }
+        data.append('document',blob);
+        fetch("http://localhost:1337/cictdrive/upload-file", {
+             method: 'POST',
+             body:data,
+        }).then(data => data.json()).then(data => {
+            console.log(data)
+            console.log('Change',uploadChange)
+            let change = uploadChange
+            setUploadChange(change+1)
+            console.log('Change',uploadChange)
+        })
+
+
+        
+
+      }
+
 
     return(
         <div className="h-100">
+
+                
+
                 <div className="row navbar-static-top">
-                    <div className="col">
+
                     
+                    <div className="col">
                         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
                             <div className="container-fluid">
                                 <a className="navbar-brand" href="/home">CICT Drive</a>
@@ -71,8 +151,13 @@ function Parameter(props){
                                     <div className='row text-light justify-content-center p-2' style={{ height: '92.5%'}}>
                                         <div className='col-12'>
                                             <button className='btn-dark form-control my-2'>Upload File</button>
+                                            <input type="file" onChange={saveFile} multiple/>
+                                            <button onClick={handleUpload}>Upload</button>
+                                            
                                         </div>
                                     </div>
+
+                                
 
                                 </div>
 
@@ -91,7 +176,20 @@ function Parameter(props){
                                     </div>
 
                                     <div className="row justify-content-center p-3 overflow-auto" style={{ height: '78vh'}}>
-                                        {'Parameter '+params.paramId+' files'}
+                                      
+                                        <table className="table">
+                                            <thead className="bg-dark text-light">
+                                                <tr>
+                                                    <th scope="col">Filename</th>
+                                                    <th scope="col">Type</th>
+                                                    <th scope="col"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {files}
+                                            </tbody>
+                                        </table>
+
 
                                     </div>
 
