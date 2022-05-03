@@ -21,8 +21,6 @@ function Registration(){
 
     // container current selected value of level
     
-
-
     const [formErrors, setFormErrors] = useState({})
 
     const [unameExist, setUnameExist] = useState('') 
@@ -51,21 +49,7 @@ function Registration(){
                     phases = levels[i].level
                 }
                 
-                // if(level === levels[0].value){
-                //     phases = levels[0].level
-                // }else if(level === levels[1].value){
-                //     phases= levels[1].level
-                // }else if(level === levels[2].value){
-                //     phases = levels[2].level
-                // }else if(level === levels[3].value){
-                //     phases = levels[3].level
-                // }else{
-
-                // }
             }
-            // else{
-            //     console.log('no level selected yet')
-            // }
             
         }else{
             console.log('loading')
@@ -79,7 +63,7 @@ function Registration(){
                     let num =0 
                     return(
                         phases.map((phasess)=>(
-                            <option value={num++} key={num} >Phase {num} {phasess}</option>
+                            <option value={num++} key={num} >Phase {num}</option>
                         ))
                     )
                 }
@@ -176,8 +160,7 @@ function Registration(){
                  )
  
          }
-        // console.log(isSubmit)
-        // setIsSubmit(true)
+        
     }
 
     return(

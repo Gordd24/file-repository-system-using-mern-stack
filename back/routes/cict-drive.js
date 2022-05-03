@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs')
 //for routing use router class!
 const router = express.Router();
-
+const jwt = require('jsonwebtoken')
 //for files
 const fs = require('fs');
 //middleware for uploading files, files will be accesible by req.files.filename
@@ -12,14 +12,39 @@ const fileupload = require("express-fileupload");
 router.use(fileupload());
 router.use(express.static("files"));
 
+
+
 //import Schemas
 const UserModel = require('../models/user.js');
 const LevelModel = require('../models/level.js');
 const FileModel = require('../models/file.js');
 const { json } = require('express');
+//refresh token schema
+const RefreshTokenModel = require('../models/refreshToken.js')
+
+
+const { application, response } = require('express');
+const e = require('express');
 
 //specify the routes!
+//verify token  
+const verify = (request, response, next) => {
+  const authHeader = request.headers.authorization;
 
+  if (authHeader){
+    const token = authHeader.split(" ")[1]
+    jwt.verify(token, 'sampleSecretKey',(error,data)=>{
+      if(error){
+        return response.status(403).json('Token is not valid')
+      }
+
+      request.user = data
+      next()
+    })
+  }else{
+    response.status(401).json('Not authenticated')
+  }
+}
 //registration
 router.post("/sign_up", async (request, response) =>{
   
@@ -67,12 +92,14 @@ router.post("/sign_up", async (request, response) =>{
         }
       console.log(err)
       
-  }
-})
+    }
+  
+   
+  })
 
 
 //sign_in
-  router.post("/sign_in", async (request, response) => {
+  /* router.post("/sign_in", async (request, response) => {
 
     const user = await UserModel.findOne({
       username: request.body.username,
@@ -93,63 +120,162 @@ router.post("/sign_up", async (request, response) =>{
     }else{
           return response.json({status:'user-not-found'})
     }
+  }); */
+
+ 
+  
+  //take token from  user
+  router.post("/refresh", (request, response)=>{
+    const refreshToken = request.body.token
+      if(!refreshToken) return response.status(401).json('not authenticated')
+      const find_refresh_token = RefreshTokenModel.findOne({token:refreshToken})
+      if(!find_refresh_token){
+        return response.status(403).json('Refresh token not valid')
+      }
+      jwt.verify(refreshToken,'sampleRefreshSecretKey', (err,user)=>{
+        err && console.log(err)
+          // refreshTokens = refreshTokens.filter((token)=> token !== refreshToken)
+          const newAccessToken = generateAccessToken(user)
+          //new token
+          RefreshTokenModel.findOneAndUpdate({token:refreshToken},{token:newAccessToken}, {new:true})
+          
+
+          response.status(200).json({
+            accessToken: newAccessToken
+          })
+
+      })
+  })
+
+
+  const generateAccessToken = (user)=>{
+    return jwt.sign({
+        id: user._id,
+        fName: user.fName,
+        lName: user.lName,
+        username: user.username,
+        level: user.level,
+        phase: user.phase,
+        area: user.area,
+        type: user.type
+      },"sampleSecretKey",{
+        expiresIn:"15m"
+      })
+  }
+
+  const generateRefreshToken = user => {
+    return jwt.sign({
+        id: user._id,
+        fName: user.fName,
+        lName: user.lName,
+        username: user.username,
+        level: user.level,
+        phase: user.phase,
+        area: user.area,
+        type: user.type
+      },"sampleRefreshSecretKey")
+  }
+
+  router.post("/sign_in", async (request, response) => {
+    const user = await UserModel.findOne({
+      username: request.body.username,
+    })
+  
+    if(!user){
+      return response.status(400).json('username is incorrectsss')
+    }
+  
+    const isPasswordCorrect = await bcrypt.compare(
+      request.body.password,
+      user.password
+    )
+  
+    if (isPasswordCorrect){
+          const accessToken = generateAccessToken(user)
+          const refreshToken = generateRefreshToken(user)
+          const findTokenInDb = await RefreshTokenModel.findOne({user:user._id})
+          if(!findTokenInDb){
+            const refreshTokenModel = new RefreshTokenModel({
+                token: refreshToken,
+                user: user._id
+            })
+            await refreshTokenModel.save();
+          }else{
+            //new Token
+            await RefreshTokenModel.findOneAndUpdate({user:user._id},{token:refreshToken},{new:true})
+          }
+          
+          response.json({
+            accessToken,
+            refreshToken
+          })
+    }else{
+        return response.status(400).json(' password is incorrect')
+    }
   });
 
+  
+  
+
+  //deauthenticate - logout
+  //delete token
+  router.delete("/logout",verify,(request, response)=>{
+    const refreshToken = request.body.token
+    console.log(refreshToken)
+    
+    RefreshTokenModel.findOneAndDelete({token: refreshToken}, function(error, docs){
+      if(error){
+        console.log(error)
+      }else{console.log("Deleted : ", docs)}
+    })
+    //refreshTokens= refreshTokens.filter((token)=>token !== refreshToken)
+    response.status(200).json( refreshToken + " log out success")
+  })
   //create level
   // should create the directory.
   // Shall be able to filter if the level is at its maximum.
   router.post('/create-level', async (request, response) => {
 
-    LevelModel.find({}).then(data => 
-      {
-        let levelValue = 1
-        for (let i = 0; i<data.length; i++){
-            levelValue = data.length + 1
-        }
-        if(data.length<4){
-          var dir = './files/'+request.body.level;
-
-          if (!fs.existsSync(dir)){
-              fs.mkdirSync(dir);
-    
-              try{
-                  LevelModel.create({
-                  level: [],
-                  value:  levelValue
-                },(err,doc)=>{
-                  if(!err){
-                    response.json({level: doc.id})
-                  }
-                })
-
-              }catch(err){
-                console.log(err)
-                response.json({status: err, error:'something wrong'})
-              }
-        
+      LevelModel.find({}).then(data => 
+        {
+          let levelValue = 1
+          for (let i = 0; i<data.length; i++){
+              levelValue = data.length + 1
           }
+          if(data.length<4){
+            var dir = './files/'+request.body.level;
 
-        }else{
-            response.json({level:'Maximum'})
+            if (!fs.existsSync(dir)){
+                fs.mkdirSync(dir);
+      
+                try{
+                    LevelModel.create({
+                    level: [],
+                    value:  levelValue
+                  },(err,doc)=>{
+                    if(!err){
+                      response.json({level: doc.id})
+                    }
+                  })
+
+                }catch(err){
+                  console.log(err)
+                  response.json({status: err, error:'something wrong'})
+                }
+          
+            }
+
+          }else{
+              response.json({level:'Maximum'})
+          }
         }
-      }
-    );
-
-    
-});
-
-router.get('/levels', async (request, response)=>{
-  await LevelModel.find({})
-   .then((data)=>{
-     console.log('Data: ', data)
-     response.json(data)
-   })
-   .catch((error)=>{
-     console.log("Error: ", error)
-   })
- })
-
-
+      );
+      // await LevelModel.findOneAndUpdate(
+      //   { _id: '626072d5d97cb44ff44620d3'}, 
+      //   { $push: {'level':[]}}
+      // );
+      
+  });
 
   router.get('/load-levels', async (request, response) => {
 
@@ -165,6 +291,16 @@ router.get('/levels', async (request, response)=>{
     
   });
 
+  router.get('/levels', async (request, response)=>{
+    await LevelModel.find({})
+     .then((data)=>{
+       console.log('Data: ', data)
+       response.json(data)
+     })
+     .catch((error)=>{
+       console.log("Error: ", error)
+     })
+   })
 
   //create phase
   // should create the directory.
@@ -204,9 +340,6 @@ router.get('/levels', async (request, response)=>{
                               {new:true},);
                           }
                       }
-                   
-                    
-
                   })
                   
                  
@@ -302,129 +435,128 @@ router.post('/load-params', async (request, response) => {
   
   }) 
 
- 
-});
-
-
-router.post("/upload-file", (req, res) => {
-  const newpath = "./tmpfiles/";
-  const files = req.files.files;
-  const doc = req.files.document;
-  const docname = doc.name
-  // console.log(filename)
-  // console.log(docname)
-
-  doc.mv(`${newpath}${docname}`, (err) => {
-    if (err) {
-      res.status(500).send({ message: "File upload failed", code: 200 });
-    }else{
-      const fs = require("fs");
-      fs.readFile(newpath+docname, (error, data) => {
-          if(error) {
-              throw error;
-          }
-          const blobStr = data.toString();
-          blobData = JSON.parse(blobStr)
-          dir = './files/'+blobData.dir+'/';
-
-          if(typeof(files)=='object'&&files.length>0){
-              let filesObj = []
-              files.forEach(function (item,id,array) {
-               
-                item.mv(`${dir}${item.name}`, (err) => {
+  router.post("/upload-file", (req, res) => {
+    const newpath = "./tmpfiles/";
+    const files = req.files.files;
+    const doc = req.files.document;
+    const docname = doc.name
+    // console.log(filename)
+    // console.log(docname)
+  
+    doc.mv(`${newpath}${docname}`, (err) => {
+      if (err) {
+        res.status(500).send({ message: "File upload failed", code: 200 });
+      }else{
+        const fs = require("fs");
+        fs.readFile(newpath+docname, (error, data) => {
+            if(error) {
+                throw error;
+            }
+            const blobStr = data.toString();
+            blobData = JSON.parse(blobStr)
+            dir = './files/'+blobData.dir+'/';
+  
+            if(typeof(files)=='object'&&files.length>0){
+                let filesObj = []
+                files.forEach(function (item,id,array) {
+                 
+                  item.mv(`${dir}${item.name}`, (err) => {
+                    if (err) {
+                      res.status(500).send({ message: "File upload failed", code: 200 });
+                    }else{
+                      FileModel.create({
+                        filename:item.name,
+                        directory:blobData.dir,
+                        type:item.mimetype
+                      })
+                        console.log({filename:item.name,directory:blobData.dir,type:item.mimetype})
+                        if (id === array.length - 1){ 
+                            filesObj.push({filename:item.name,directory:blobData.dir,type:item.mimetype})
+                            res.json(filesObj)
+                        }else{
+                            filesObj.push({filename:item.name,directory:blobData.dir,type:item.mimetype})
+                        }
+                    }
+                    
+                  });
+                }); 
+              
+            }else if(typeof(files)=='object'){
+                
+                files.mv(`${dir}${files.name}`, (err) => {
                   if (err) {
                     res.status(500).send({ message: "File upload failed", code: 200 });
                   }else{
                     FileModel.create({
-                      filename:item.name,
+                      filename:files.name,
                       directory:blobData.dir,
-                      type:item.mimetype
+                      type:files.mimetype
                     })
-                      console.log({filename:item.name,directory:blobData.dir,type:item.mimetype})
-                      if (id === array.length - 1){ 
-                          filesObj.push({filename:item.name,directory:blobData.dir,type:item.mimetype})
-                          res.json(filesObj)
-                      }else{
-                          filesObj.push({filename:item.name,directory:blobData.dir,type:item.mimetype})
-                      }
                   }
+  
+                  let fileObj=[]
+                  fileObj.push({filename:files.name,directory:blobData.dir,type:files.mimetype})
+                  res.json(fileObj)
                   
                 });
-              }); 
-            
-          }else if(typeof(files)=='object'){
-              
-              files.mv(`${dir}${files.name}`, (err) => {
-                if (err) {
-                  res.status(500).send({ message: "File upload failed", code: 200 });
-                }else{
-                  FileModel.create({
-                    filename:files.name,
-                    directory:blobData.dir,
-                    type:files.mimetype
-                  })
-                }
-
-                let fileObj=[]
-                fileObj.push({filename:files.name,directory:blobData.dir,type:files.mimetype})
-                res.json(fileObj)
-                
-              });
-             
-          }
-
-
-      });
-    }
+               
+            }
+  
+  
+        });
+      }
+      
+    });
+  
     
   });
-
   
-});
-
-
-router.post("/load-files", (req, res) => {
   
-      FileModel.find({directory:req.body.dir}).then(data => 
-        {
-
-          let filesObj = {}
-         
-         
-
-          for(let i = 0; i < data.length; i++){
-            let fileId = data[i].id;
-            filesObj[i]={filename:data[i].filename,directory:data[i].directory,type:data[i].type}
+  router.post("/load-files", (req, res) => {
+    
+        FileModel.find({directory:req.body.dir}).then(data => 
+          {
+  
+            let filesObj = {}
+           
+           
+  
+            for(let i = 0; i < data.length; i++){
+              let fileId = data[i].id;
+              filesObj[i]={filename:data[i].filename,directory:data[i].directory,type:data[i].type}
+            }
+            res.json(filesObj)
           }
-          res.json(filesObj)
-        }
-      );
+        );
+    
+  });
   
+  
+  router.post("/download-file", (req, res) => {
+    res.download('./files/'+req.body.path+'/'+req.body.filename)
+  
+  });
+  
+  
+  router.post("/delete-file", (req, res) => {
+    const path = './files/'+req.body.path+'/'+req.body.filename
+  
+    try {
+      fs.unlinkSync(path)
+      FileModel.deleteOne({ directory:req.body.path,filename:req.body.filename}).then(function(){
+        console.log("Data deleted"); // Success
+        res.json({message:'ok'})
+      }).catch(function(error){
+          console.log(error); // Failure
+      });
+      //file removed
+    } catch(err) {
+      console.error(err)
+    }
+  
+  });
+  
+ 
 });
 
-
-router.post("/download-file", (req, res) => {
-  res.download('./files/'+req.body.path+'/'+req.body.filename)
-
-});
-
-
-router.post("/delete-file", (req, res) => {
-  const path = './files/'+req.body.path+'/'+req.body.filename
-
-  try {
-    fs.unlinkSync(path)
-    FileModel.deleteOne({ directory:req.body.path,filename:req.body.filename}).then(function(){
-      console.log("Data deleted"); // Success
-      res.json({message:'ok'})
-    }).catch(function(error){
-        console.log(error); // Failure
-    });
-    //file removed
-  } catch(err) {
-    console.error(err)
-  }
-
-});
-
-module.exports = router;
+  module.exports = router;

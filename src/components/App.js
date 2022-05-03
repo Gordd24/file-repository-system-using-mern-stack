@@ -5,27 +5,26 @@ import Level from './pages/Level';
 import Phase from './pages/Phase';
 import Area from './pages/Area';
 import Parameter from './pages/Parameter';
-import Test from './pages/test';
 import Registration from './pages/Registration';
 import { BrowserRouter, Route, Routes} from 'react-router-dom';
+import { RedirectHome,RequireAuth} from './pages/RequireAuth'
 
 function App() {
+  
   return (
     <div className="h-100">
         <BrowserRouter>
           <Routes>
-            <Route path="/" element ={<SignIn />}/>
-            <Route path='/home' element={<Home/>}></Route>
-            <Route path='/home/level/:id' element={<Level/>}></Route>
-            <Route path='/home/level/:id/:phaseId' element={<Phase/>}></Route>
-            <Route path='/home/level/:id/:phaseId/:areaId' element={<Area/>}></Route>
-            <Route path='/home/level/:id/:phaseId/:areaId/:paramId' element={<Parameter/>}></Route>
-            <Route path='/test' element={<Test/>}></Route>
-            <Route path='/registration' element={<Registration/>}></Route>
+            <Route path="/" element ={<RedirectHome><SignIn /></RedirectHome>}/>
+            <Route path='/home' element={<RequireAuth><Home/></RequireAuth>}></Route>
+            <Route path='/home/level/:id' element={<RequireAuth><Level/></RequireAuth>}></Route>
+            <Route path='/home/level/:id/:phaseId' element={<RequireAuth><Phase/></RequireAuth>}></Route>
+            <Route path='/home/level/:id/:phaseId/:areaId' element={<RequireAuth><Area/></RequireAuth>}></Route>
+            <Route path='/home/level/:id/:phaseId/:areaId/:paramId' element={<RequireAuth><Parameter/></RequireAuth>}></Route>
+            <Route path='/registration' element={<RequireAuth><Registration/></RequireAuth>}></Route>
+            {/* <Route path='/testing' element={<Testing/>}></Route> */}
           </Routes>
         </BrowserRouter>
-
-
     </div>
   );
 }

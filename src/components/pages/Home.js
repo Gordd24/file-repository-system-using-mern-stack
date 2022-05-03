@@ -1,10 +1,17 @@
 import Level from '../page-components/LevelCard'
 import logout from '../page-components/Logout';
 import React,{useState,useEffect} from 'react';
+import jwt_decode from 'jwt-decode'
 
 
 function Home(){
-
+    const user = localStorage.getItem('user')
+    const object = JSON.parse(user)
+    const accessToken = object.accessToken
+    //decode the access token
+    const decodeToken = jwt_decode(accessToken)
+    console.log(decodeToken.type)
+    
     const[levelComps,setLevelComps] = useState([])
     const[levels,setLevels] = useState([])
     useEffect(
@@ -42,25 +49,17 @@ function Home(){
                 alert('Level creation has reached its maximum limit!')
             }else{
                 setLevels([...levels,data.level])
-                alert('Level '+(levels.length+1)+' was successfully created!')
-               
-            }
-            
+                alert('Level '+(levels.length+1)+' was successfully created!')       
+            }  
         })
-
-       
-
     }
 
-   
 
-   
-    
     return(
         <div className="h-100">
                 <div className="row navbar-static-top">
                     <div className="col">
-                    
+
                         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
                             <div className="container-fluid">
                                 <a className="navbar-brand" href="/home">CICT Drive</a>
@@ -147,6 +146,4 @@ function Home(){
         </div>
     )
 }
-
-
 export default Home;

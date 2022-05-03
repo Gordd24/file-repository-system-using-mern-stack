@@ -1,14 +1,73 @@
 import Field from '../page-components/Field';
 import Button from '../page-components/Button';
 import React, {useState} from 'react';
+import axios from 'axios';
+import jwt_decode from 'jwt-decode'
 
 function SignIn(){
+    
 
     const[username,setUsername] = useState('');
     const[password,setPassword] = useState('');
+    const[user,setUser] = useState(null)
 
+    const refreshToken = async()=>{
+        try {
+            const response = await axios.post('http://localhost:1337/cictdrive/refresh')
+            setUser({
+                //spread syntax daw ung ... di ko masyado gets pero iniispread nya daw ung laman ng arrays??
+                ...user,
+                accessToken : response.data.accessToken,
+                refreshToken : response.data.refreshToken,
+            })
+            return response.data
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    //axios instance
+    const axiosRefresh = axios.create()
 
-    function signIn(e) {
+    //para mag auto refresh ung token
+    //if expired na ung token, tatawagin ito
+    axiosRefresh.interceptors.request.use(async (config) =>{
+        let currentDate = new Date()
+        const decodeToken = jwt_decode(user.accessToken)
+
+        // checheck  kung expired na ung access token 
+        if(decodeToken.exp *1000 < currentDate.getTime()){
+            const data = await refreshToken()
+            config.headers['authorization'] = "Bearer " + data.accessToken
+        }
+        return config
+    },(error)=> {
+        //pag may error, cancel
+        return Promise.reject(error)
+    })
+    
+    
+    const signIn = async (e) =>{
+        e.preventDefault()
+        try {
+            //api request
+            const response = await axios.post('http://localhost:1337/cictdrive/sign_in',({
+                username,password
+            }))
+            setUser(response.data)
+            if(response.data.accessToken){
+                if(response.status === 200){
+                    localStorage.setItem('user', JSON.stringify(response.data))
+                    window.location.href  = '/home'
+                }
+            }
+            // console.log(response.data)
+        } catch (error) {
+            alert('Username or password is incorrect')
+            console.log(error)
+        }
+    } 
+
+    /* function signIn(e) {
         e.preventDefault();
         console.log('Attempted to Sign In...');
        
@@ -33,7 +92,7 @@ function SignIn(){
                 }
             }
         )
-    }
+    } */
 
     return(
        <div className="row h-100">
