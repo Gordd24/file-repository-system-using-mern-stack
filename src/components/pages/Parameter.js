@@ -1,4 +1,5 @@
 import logout from '../page-components/Logout';
+import FileRow from '../page-components/FileRow';
 import React,{useState,useEffect} from 'react';
 import { useParams } from 'react-router-dom';
 
@@ -10,8 +11,6 @@ function Parameter(props){
     const [file, setFile] = useState('');
     //for displaying list of files
     const [files,setFiles] = useState([]);
-
-    const [uploadChange,setUploadChange] = useState(1)
 
     useEffect(
         ()=>{
@@ -30,11 +29,8 @@ function Parameter(props){
 
                 let rows = []
                 for (const item in data) {
-                    let row = <tr key={item}>
-                                <th scope="row">{data[item].filename}</th>
-                                <td>{data[item].type}</td>
-                                <td>action</td>
-                            </tr>
+                    let fileData = data[item]
+                    let row = <FileRow path={fileData.directory} key={item+fileData.filename} filename={fileData.filename} filetype={fileData.type}/>
                     rows.push(row)
                 }
                 
@@ -44,7 +40,7 @@ function Parameter(props){
 
             
         }
-    ,[uploadChange])
+    ,[])
 
     const saveFile = (e) => {
     setFile(e.target.files);
@@ -72,11 +68,20 @@ function Parameter(props){
              method: 'POST',
              body:data,
         }).then(data => data.json()).then(data => {
-            console.log(data)
-            console.log('Change',uploadChange)
-            let change = uploadChange
-            setUploadChange(change+1)
-            console.log('Change',uploadChange)
+            window.location.href= '/home/level/'+params.id+'/'+params.phaseId+'/'+params.areaId+'/'+params.paramId
+
+            //for proper rerender
+            // let newFiles=[]
+            // for(let i = 0; i < data.length; i++){
+            //     console.log('data'+i,data[i])
+            //     newFiles.push(<tr key={i+data[i].filename}>
+            //                         <th scope="row">{data[i].filename}</th>
+            //                         <td>{data[i].type}</td>
+            //                         <td>action</td>
+            //                     </tr>)
+            // }
+            // console.log('array',newFiles)
+            // setFiles(files.concat(newFiles))
         })
 
 

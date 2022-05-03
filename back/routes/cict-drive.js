@@ -311,7 +311,6 @@ router.post("/upload-file", (req, res) => {
   const files = req.files.files;
   const doc = req.files.document;
   const docname = doc.name
-  console.log(files)
   // console.log(filename)
   // console.log(docname)
 
@@ -327,12 +326,11 @@ router.post("/upload-file", (req, res) => {
           const blobStr = data.toString();
           blobData = JSON.parse(blobStr)
           dir = './files/'+blobData.dir+'/';
-            
-          console.log('dir = '+dir)
 
           if(typeof(files)=='object'&&files.length>0){
-              files.forEach(function (item) {
-                console.log(item.name)
+              let filesObj = []
+              files.forEach(function (item,id,array) {
+               
                 item.mv(`${dir}${item.name}`, (err) => {
                   if (err) {
                     res.status(500).send({ message: "File upload failed", code: 200 });
@@ -342,14 +340,20 @@ router.post("/upload-file", (req, res) => {
                       directory:blobData.dir,
                       type:item.mimetype
                     })
+                      console.log({filename:item.name,directory:blobData.dir,type:item.mimetype})
+                      if (id === array.length - 1){ 
+                          filesObj.push({filename:item.name,directory:blobData.dir,type:item.mimetype})
+                          res.json(filesObj)
+                      }else{
+                          filesObj.push({filename:item.name,directory:blobData.dir,type:item.mimetype})
+                      }
                   }
                   
                 });
               }); 
-              console.log('okeh')
-              res.status(200).send({ message: "File/s Load", code: 200 });
+            
           }else if(typeof(files)=='object'){
-              console.log(files.name)
+              
               files.mv(`${dir}${files.name}`, (err) => {
                 if (err) {
                   res.status(500).send({ message: "File upload failed", code: 200 });
@@ -360,7 +364,11 @@ router.post("/upload-file", (req, res) => {
                     type:files.mimetype
                   })
                 }
-                res.status(200).send({ message: "File/s Uploaded", code: 200 });
+
+                let fileObj=[]
+                fileObj.push({filename:files.name,directory:blobData.dir,type:files.mimetype})
+                res.json(fileObj)
+                
               });
              
           }
@@ -394,4 +402,29 @@ router.post("/load-files", (req, res) => {
   
 });
 
-  module.exports = router;
+
+router.post("/download-file", (req, res) => {
+  res.download('./files/'+req.body.path+'/'+req.body.filename)
+
+});
+
+
+router.post("/delete-file", (req, res) => {
+  const path = './files/'+req.body.path+'/'+req.body.filename
+
+  try {
+    fs.unlinkSync(path)
+    FileModel.deleteOne({ directory:req.body.path,filename:req.body.filename}).then(function(){
+      console.log("Data deleted"); // Success
+      res.json({message:'ok'})
+    }).catch(function(error){
+        console.log(error); // Failure
+    });
+    //file removed
+  } catch(err) {
+    console.error(err)
+  }
+
+});
+
+module.exports = router;
