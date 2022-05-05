@@ -574,24 +574,42 @@ router.post('/load-params', async (request, response) => {
       console.log('new',newPath)
     fs.rename(oldPath, newPath, function (err) {
       if (!err){
-
+        FileModel.findOneAndUpdate({_id:data.fileId }, 
+            {directory:data.level+'/'+data.phase+'/'+data.area+'/'+data.newParam}, null, function (err, docs) {
+            if (err){
+                console.log(err)
+            }
+            else{
+                res.json({mess:'Success',newParam:data.newParam})
+            }
+        });
       }
     })
-    // Find document matching the condition(age >= 5)
-    // and update first document with new name='Anuj'
-    // This function has 4 parameters i.e. filter,
-    // update, options, callback
-    console.log(data.fileId)
-    FileModel.findOneAndUpdate({_id:data.fileId }, 
-        {directory:data.level+'/'+data.phase+'/'+data.area+'/'+data.newParam}, null, function (err, docs) {
-        if (err){
-            console.log(err)
-        }
-        else{
-            res.json({mess:'Success',newParam:data.newParam})
-        }
-    });
+   
   
+  });
+
+
+  router.post("/rename-file", (req, res) => {
+    data = req.body
+    var oldPath = './files/'+data.path+'/'+data.oldFilename+'.'+data.type
+    var newPath =  './files/'+data.path+'/'+data.newFilename+'.'+data.type
+      
+      console.log('old',oldPath)
+      console.log('new',newPath)
+    fs.rename(oldPath, newPath, function (err) {
+      if (!err){
+        FileModel.findOneAndUpdate({_id:data.fileId }, 
+            {filename:data.newFilename+'.'+data.type}, null, function (err, docs) {
+            if (err){
+                console.log(err)
+            }
+            else{
+                res.json({mess:'Success',newParam:data.newParam})
+            }
+        });
+      }
+    })
   });
   
  

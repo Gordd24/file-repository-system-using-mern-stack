@@ -6,13 +6,25 @@ import { Modal,Button,ButtonGroup,Dropdown } from 'react-bootstrap';
 function FileRow(props){
 
     const [show, setShow] = useState(false);
+    const [showRename, setShowRename] = useState(false);
     const[dir,setDir] = useState([]);
+    const[renameFile,setRenameFile] = useState('')
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
+    const handleCloseRename = () => 
+    {
+        setRenameFile('')
+        setShowRename(false)
+    }
+    const handleShowRename = () => setShowRename(true);
+
     const params = useParams()
 
+    const filenameArr = props.filename.split(".");
     useEffect(()=>{
+        console.log(filenameArr[0])
+        console.log(filenameArr[1])
         fetch('http://localhost:1337/cictdrive/load-dir',{
             method:'POST',
             headers:{
@@ -58,9 +70,6 @@ function FileRow(props){
         })
     },[])
 
-    function view(){
-        console.log(props.path)
-    }
     function del(){
         fetch('http://localhost:1337/cictdrive/delete-file',{
             method:'POST',
@@ -79,9 +88,6 @@ function FileRow(props){
            } 
         })
     }
-    function move(){
-        window.location.href='/move/'+props.levelId+'/'+props.phaseId+'/'+props.areaId+'/'+props.paramId
-    }
 
     function downloadFile(e){
         e.preventDefault()
@@ -97,6 +103,33 @@ function FileRow(props){
             
             FileDownload(res.data,props.filename)
         })
+    }
+
+    function rename(e) {
+        e.preventDefault()
+        console.log(filenameArr[0])
+        console.log(renameFile)
+
+        fetch('http://localhost:1337/cictdrive/rename-file',{
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify({
+                'fileId':props.fileId,
+                'path':props.path,
+                'newFilename': renameFile,
+                'type': filenameArr[1],
+                'oldFilename':  filenameArr[0]
+            })
+
+        }).then(data=>data.json()).then(data=>
+            {
+                if(data.mess=="Success"){
+                    alert('File is Succesfully Renamed')
+                    window.location.href='/home/level/'+props.path
+                } 
+             })
     }
     return(
         <tr>
@@ -117,11 +150,34 @@ function FileRow(props){
                     </Dropdown>
                 </Modal.Body>
             </Modal>
+
+
+
+            <Modal show={showRename} onHide={handleCloseRename} aria-labelledby="contained-modal-title-vcenter" centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>{filenameArr[0]}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                <form onSubmit={rename}>
+                    <div className='row justify-content-center mb-3'>
+                        <div className='col-10'>
+                            <input type="text" className="form-control" placeholder={filenameArr[0]} value={renameFile} onChange={(e)=> setRenameFile(e.target.value)}/>  
+                        </div>
+                    </div>
+                    <div className='row justify-content-center mb-3'>
+                        <div className='col-10'>
+                            <button type="submit" className="form-control btn btn-dark">Rename</button>
+                        </div>
+                    </div>     
+                </form>
+                </Modal.Body>
+            </Modal>
+
             <th scope="row">{props.filename}</th>
             <td>{props.filetype}</td>
             <td>
                 <ButtonGroup aria-label="First group">
-                    <Button variant="outline-dark" onClick={view}>View</Button>
+                    <Button variant="outline-dark" onClick={handleShowRename}>Rename</Button>
                     <Button variant="outline-dark" onClick={del}>Delete</Button>
                     <Button variant="outline-dark" onClick={handleShow}>Move</Button>
                     <Button variant="outline-dark" onClick={downloadFile}>Download</Button>
