@@ -523,7 +523,7 @@ router.post('/load-params', async (request, response) => {
   
             for(let i = 0; i < data.length; i++){
               let fileId = data[i].id;
-              filesObj[i]={filename:data[i].filename,directory:data[i].directory,type:data[i].type}
+              filesObj[i]={filename:data[i].filename,directory:data[i].directory,type:data[i].type,id:fileId}
             }
             res.json(filesObj)
           }
@@ -555,8 +555,49 @@ router.post('/load-params', async (request, response) => {
     }
   
   });
+
+
+  router.post("/load-dir", (req, res) => {
+    LevelModel.find({}, function (err, docs) {
+      res.json({directions:[docs[req.body.level-1].level[req.body.phase-1]]})
+      
+    });
+  
+  });
+
+  router.post("/move-file", (req, res) => {
+    data = req.body
+    var oldPath = './files/'+data.level+'/'+data.phase+'/'+data.area+'/'+data.oldParam+'/'+data.filename
+    var newPath =  './files/'+data.level+'/'+data.phase+'/'+data.area+'/'+data.newParam+'/'+data.filename
+      
+      console.log('old',oldPath)
+      console.log('new',newPath)
+    fs.rename(oldPath, newPath, function (err) {
+      if (!err){
+
+      }
+    })
+    // Find document matching the condition(age >= 5)
+    // and update first document with new name='Anuj'
+    // This function has 4 parameters i.e. filter,
+    // update, options, callback
+    console.log(data.fileId)
+    FileModel.findOneAndUpdate({_id:data.fileId }, 
+        {directory:data.level+'/'+data.phase+'/'+data.area+'/'+data.newParam}, null, function (err, docs) {
+        if (err){
+            console.log(err)
+        }
+        else{
+            res.json({mess:'Success',newParam:data.newParam})
+        }
+    });
+  
+  });
   
  
 });
+
+
+
 
   module.exports = router;

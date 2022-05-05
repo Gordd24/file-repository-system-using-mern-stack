@@ -29,8 +29,9 @@ function Parameter(props){
 
                 let rows = []
                 for (const item in data) {
+                    
                     let fileData = data[item]
-                    let row = <FileRow path={fileData.directory} key={item+fileData.filename} filename={fileData.filename} filetype={fileData.type}/>
+                    let row = <FileRow path={fileData.directory} fileId={fileData.id} paramId={params.paramId} areaId={params.areaId} phaseId={params.phaseId} levelId={params.id} key={item+fileData.filename} filename={fileData.filename} filetype={fileData.type}/>
                     rows.push(row)
                 }
                 
