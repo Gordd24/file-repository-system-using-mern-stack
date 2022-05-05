@@ -1,7 +1,8 @@
-import logout from '../page-components/Logout';
+import Navigation from '../page-components/Navigation'
 import FileRow from '../page-components/FileRow';
 import React,{useState,useEffect} from 'react';
 import { useParams } from 'react-router-dom';
+import { Modal,Button,ButtonGroup,Dropdown } from 'react-bootstrap';
 
 
 function Parameter(props){
@@ -11,6 +12,10 @@ function Parameter(props){
     const [file, setFile] = useState('');
     //for displaying list of files
     const [files,setFiles] = useState([]);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+    const [show, setShow] = useState(false);
 
     useEffect(
         ()=>{
@@ -93,41 +98,30 @@ function Parameter(props){
 
     return(
         <div className="h-100">
-
-                
-
-                <div className="row navbar-static-top">
-
-                    
-                    <div className="col">
-                        <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-                            <div className="container-fluid">
-                                <a className="navbar-brand" href="/home">CICT Drive</a>
-
-                                <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-                                    <span className="navbar-toggler-icon"></span>
-                                </button>
-
-                                <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
-                                    <div className="navbar-nav">
-                                        <a className="nav-link active" href="/home">Home</a>
-                                        <a className="nav-link" href="/registration">Registration</a>
-                                        <a className="nav-link" href="#">Logs</a>
-                                        <li className="nav-item dropdown">
-                                            <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                My Account
-                                            </a>
-                                            <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
-                                                <li><a className="dropdown-item" href="#">Update</a></li>
-                                                <li><a className="dropdown-item" onClick={logout} href='#'>Sign Out</a></li>
-                                            </ul>
-                                        </li>
-                                    </div>
-                                </div>
-
+                 <Modal show={show} onHide={handleClose} aria-labelledby="contained-modal-title-vcenter" centered>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Upload File</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <div className='row justify-content-center mb-3'>
+                            <div className='col-10'>
+                                <input className="form-control" type="file" onChange={saveFile} multiple></input>
                             </div>
-                        </nav>   
+                        </div>
 
+                        <div className='row justify-content-center mb-3'>
+                            <div className='col-10'>
+                                <button className='btn btn-dark form-control' onClick={handleUpload}>Upload</button>
+                            </div>
+                        </div>
+                       
+                    </Modal.Body>
+                </Modal>
+                    
+
+                    <div className="row navbar-static-top">                    
+                        <div className="col">
+                            <Navigation />
                         </div>
                     </div>
 
@@ -156,9 +150,8 @@ function Parameter(props){
 
                                     <div className='row text-light justify-content-center p-2' style={{ height: '92.5%'}}>
                                         <div className='col-12'>
-                                            <button className='btn-dark form-control my-2'>Upload File</button>
-                                            <input type="file" onChange={saveFile} multiple/>
-                                            <button onClick={handleUpload}>Upload</button>
+                                            <button className='btn-dark form-control my-2' onClick={handleShow}>Upload File</button>
+                                            
                                             
                                         </div>
                                     </div>
