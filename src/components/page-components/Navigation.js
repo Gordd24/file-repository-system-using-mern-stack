@@ -1,4 +1,15 @@
 import logout from '../page-components/Logout';
+import jwt_decode from 'jwt-decode'
+
+let accountType = ''
+if(localStorage.getItem('user')!==null){
+    const user = localStorage.getItem('user')
+    const object = JSON.parse(user)
+    const accessToken = object.accessToken
+    //decode the access token
+    const decodeToken = jwt_decode(accessToken)
+    accountType= decodeToken.type
+}
 function Navigation(){
     return(
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -12,7 +23,11 @@ function Navigation(){
                 <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
                     <div className="navbar-nav">
                         <a className="nav-link" href="/home">Home</a>
-                        <a className="nav-link" href="/registration">Registration</a>
+                        {
+                            accountType ==='admin' &&
+                            <a className="nav-link" href="/registration">Registration</a>
+                        }
+                        
                         <a className="nav-link" href="#">Logs</a>
                         <li className="nav-item dropdown">
                             <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">

@@ -3,9 +3,15 @@ import FileRow from '../page-components/FileRow';
 import React,{useState,useEffect} from 'react';
 import { useParams } from 'react-router-dom';
 import { Modal,Button,ButtonGroup,Dropdown } from 'react-bootstrap';
+import jwt_decode from 'jwt-decode'
 
 
 function Parameter(props){
+    const user = localStorage.getItem('user')
+    const object = JSON.parse(user)
+    const accessToken = object.accessToken
+    const decodeToken = jwt_decode(accessToken)
+    const personName = decodeToken.fName + ' ' + decodeToken.lName
 
     const params = useParams()
 
@@ -73,6 +79,7 @@ function Parameter(props){
         fetch("http://localhost:1337/cictdrive/upload-file", {
              method: 'POST',
              body:data,
+             personName
         }).then(data => data.json()).then(data => {
             window.location.href= '/home/level/'+params.id+'/'+params.phaseId+'/'+params.areaId+'/'+params.paramId
 

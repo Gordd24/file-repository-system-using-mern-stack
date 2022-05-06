@@ -7,7 +7,7 @@ import Area from './pages/Area';
 import Parameter from './pages/Parameter';
 import Registration from './pages/Registration';
 import { BrowserRouter, Route, Routes} from 'react-router-dom';
-import { RedirectHome,RequireAuth} from './pages/RequireAuth'
+import { RedirectHome,RequireAuth,AdminCheck} from './pages/RequireAuth'
 
 function App() {
   
@@ -21,7 +21,7 @@ function App() {
             <Route path='/home/level/:id/:phaseId' element={<RequireAuth><Phase/></RequireAuth>}></Route>
             <Route path='/home/level/:id/:phaseId/:areaId' element={<RequireAuth><Area/></RequireAuth>}></Route>
             <Route path='/home/level/:id/:phaseId/:areaId/:paramId' element={<RequireAuth><Parameter/></RequireAuth>}></Route>
-            <Route path='/registration' element={<RequireAuth><Registration/></RequireAuth>}></Route>
+            <Route path='/registration' element={<RequireAuth><AdminCheck><Registration/></AdminCheck></RequireAuth>}></Route>
             {/* <Route path='/testing' element={<Testing/>}></Route> */}
           </Routes>
         </BrowserRouter>

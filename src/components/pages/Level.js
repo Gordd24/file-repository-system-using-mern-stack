@@ -2,8 +2,14 @@ import PhaseCard from '../page-components/PhaseCard';
 import React,{useState,useEffect} from 'react';
 import { useParams } from 'react-router-dom';
 import Navigation from '../page-components/Navigation'
+import jwt_decode from 'jwt-decode'
 
 function Level(props){
+    const user = localStorage.getItem('user')
+    const object = JSON.parse(user)
+    const accessToken = object.accessToken
+    const decodeToken = jwt_decode(accessToken)
+    const personName = decodeToken.fName + ' ' + decodeToken.lName
 
     const params = useParams()
 
@@ -58,7 +64,7 @@ function Level(props){
             },
             body: JSON.stringify({
                 'level':params.id,
-                'phase':phases.length+1
+                'phase':phases.length+1,personName
             })
         }).then(data => data.json())
         .then(data => {

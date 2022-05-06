@@ -8,10 +8,9 @@ function Home(){
     const user = localStorage.getItem('user')
     const object = JSON.parse(user)
     const accessToken = object.accessToken
-    //decode the access token
     const decodeToken = jwt_decode(accessToken)
-    console.log(decodeToken.type)
-    
+    const personName = decodeToken.fName + ' ' + decodeToken.lName
+
     const[levelComps,setLevelComps] = useState([])
     const[levels,setLevels] = useState([])
     useEffect(
@@ -41,7 +40,7 @@ function Home(){
                 'Content-Type':'application/json'
             },
             body: JSON.stringify({
-                'level':levels.length+1
+                'level':levels.length+1,personName
             })
         }).then(data => data.json())
         .then(data => {

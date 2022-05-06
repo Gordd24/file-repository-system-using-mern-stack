@@ -4,8 +4,16 @@ import React,{useState,useEffect} from 'react';
 import logout from '../page-components/Logout';
 import "../css/style.css"
 import axios from 'axios'
+import jwt_decode from 'jwt-decode'
 
 function Registration(){
+    
+    const user = localStorage.getItem('user')
+    const object = JSON.parse(user)
+    const accessToken = object.accessToken
+    const decodeToken = jwt_decode(accessToken)
+    const personName = decodeToken.fName + ' ' + decodeToken.lName
+    
 
     const[fName,setFName] = useState('');
     const[mName,setMName] = useState('');
@@ -133,7 +141,7 @@ function Registration(){
                      
                  },
                  body: JSON.stringify({
-                     fName,mName,lName,email,username,password,level,phase,area,type
+                     fName,mName,lName,email,username,password,level,phase,area,type,personName
                  })
              }).then(res => res.json())
              .then(data => 

@@ -3,7 +3,13 @@ import { useParams } from 'react-router-dom';
 import Axios from 'axios'
 import FileDownload from 'js-file-download'
 import { Modal,Button,ButtonGroup,Dropdown } from 'react-bootstrap';
+import jwt_decode from 'jwt-decode'
 function FileRow(props){
+    const user = localStorage.getItem('user')
+    const object = JSON.parse(user)
+    const accessToken = object.accessToken
+    const decodeToken = jwt_decode(accessToken)
+    const personName = decodeToken.fName + ' ' + decodeToken.lName
 
     const [show, setShow] = useState(false);
     const [showRename, setShowRename] = useState(false);
@@ -54,7 +60,8 @@ function FileRow(props){
                                 oldParam: params.paramId,
                                 newParam:i+1,
                                 filename:props.filename,
-                                fileId:props.fileId
+                                fileId:props.fileId,
+                                personName
                             })
                         }).then(data=>data.json()).then(data=>{
                             if(data.mess==="Success"){
@@ -79,7 +86,8 @@ function FileRow(props){
             body: JSON.stringify({
                 'path':props.path,
                 'filename':props.filename,
-                'id':props.fileId
+                'id':props.fileId,
+                personName
             }),
         }).then(data=>data.json()).then(data=>
         {
@@ -97,7 +105,8 @@ function FileRow(props){
             method:'POST',
             data:{
                 'path':props.path,
-                'filename':props.filename
+                'filename':props.filename,
+                personName
             },
             responseType:'blob'
         }).then((res)=>{
@@ -121,7 +130,8 @@ function FileRow(props){
                 'path':props.path,
                 'newFilename': renameFile,
                 'type': filenameArr[1],
-                'oldFilename':  filenameArr[0]
+                'oldFilename':  filenameArr[0],
+                personName
             })
 
         }).then(data=>data.json()).then(data=>

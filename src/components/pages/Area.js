@@ -2,9 +2,16 @@ import Navigation from '../page-components/Navigation'
 import ParamCard from '../page-components/ParamCard';
 import React,{useState,useEffect} from 'react';
 import { useParams } from 'react-router-dom';
+import jwt_decode from 'jwt-decode'
 import { Modal } from 'react-bootstrap';
 
 function Area(props){
+
+    const user = localStorage.getItem('user')
+    const object = JSON.parse(user)
+    const accessToken = object.accessToken
+    const decodeToken = jwt_decode(accessToken)
+    const personName = decodeToken.fName + ' ' + decodeToken.lName
 
     const params = useParams()
     const[parameterComps,setParameterComps] = useState([])
@@ -25,8 +32,8 @@ function Area(props){
         if(parameters.length!==0){
             let parameterHolder = [];
             for(let i=parameterHolder.length+1;i<parameters.length+1;i++){
-                 parameterHolder.push(<ParamCard desc={parameters[i-1]} parameter={parameters[i-1]} parameterNo={i} area={params.areaId} level={params.id} phase={params.phaseId} key={i}/>);
-            }
+                parameterHolder.push(<ParamCard desc={parameters[i-1]} parameter={parameters[i-1]} parameterNo={i} area={params.areaId} level={params.id} phase={params.phaseId} key={i}/>);
+           }
             setParameterComps(parameterHolder);
         }else{
             fetch('http://localhost:1337/cictdrive/load-params',{
@@ -62,7 +69,8 @@ function Area(props){
                 'phase':params.phaseId,
                 'area':params.areaId,
                 'parameter':parameters.length+1,
-                'paramName':paramName
+                'paramName':paramName,
+                personName
             })
         }).then(data => data.json())
         .then(data => {
@@ -77,8 +85,7 @@ function Area(props){
 
     return(
         <div className="h-100">
-
-                    <Modal show={show} onHide={handleClose} aria-labelledby="contained-modal-title-vcenter" centered>
+            <Modal show={show} onHide={handleClose} aria-labelledby="contained-modal-title-vcenter" centered>
                         <Modal.Header closeButton>
                             <Modal.Title>Create Parameter</Modal.Title>
                         </Modal.Header>
@@ -97,7 +104,6 @@ function Area(props){
                         </form>
                         </Modal.Body>
                     </Modal>
-
                     <div className="row navbar-static-top">
                         <div className="col">
                             <Navigation />
@@ -128,7 +134,7 @@ function Area(props){
 
                                     <div className='row text-light justify-content-center p-2' style={{ height: '92.5%'}}>
                                         <div className='col-12'>
-                                            <button className='btn-dark form-control my-2' onClick={handleShow}>Create Parameter</button>
+                                        <button className='btn-dark form-control my-2' onClick={handleShow}>Create Parameter</button>
                                         </div>
                                     </div>
 
