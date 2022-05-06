@@ -379,7 +379,7 @@ router.post("/sign_up", async (request, response) =>{
   //create param
   // should create the directory.
   router.post('/create-param', async (request, response) => {
-    console.log(request.body.parameter);
+    console.log(request.body.paramName);
 
     var dir = './files/'+request.body.level+'/'+request.body.phase+'/'+request.body.area+'/'+request.body.parameter;
     console.log(dir)
@@ -397,7 +397,7 @@ router.post("/sign_up", async (request, response) =>{
 
             let paramObj = {}
             let areaId = 'level.'+(request.body.phase-1)+'.'+(request.body.area-1);
-            paramObj[areaId]='P-'+request.body.parameter
+            paramObj[areaId]=request.body.paramName
 
             let doc = await LevelModel.findOneAndUpdate(
             { _id: levelId}, 
@@ -447,7 +447,6 @@ router.post('/load-params', async (request, response) => {
       if (err) {
         res.status(500).send({ message: "File upload failed", code: 200 });
       }else{
-        const fs = require("fs");
         fs.readFile(newpath+docname, (error, data) => {
             if(error) {
                 throw error;
@@ -459,7 +458,6 @@ router.post('/load-params', async (request, response) => {
             if(typeof(files)=='object'&&files.length>0){
                 let filesObj = []
                 files.forEach(function (item,id,array) {
-                 
                   item.mv(`${dir}${item.name}`, (err) => {
                     if (err) {
                       res.status(500).send({ message: "File upload failed", code: 200 });
@@ -539,6 +537,7 @@ router.post('/load-params', async (request, response) => {
   
   
   router.post("/delete-file", (req, res) => {
+    console.log(req.body.id)
     const path = './files/'+req.body.path+'/'+req.body.filename
   
     try {

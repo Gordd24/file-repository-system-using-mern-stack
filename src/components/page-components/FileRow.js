@@ -40,7 +40,7 @@ function FileRow(props){
             console.log("This will load specific area containing its parameters",data.directions[0][params.areaId-1])
             let dirHolder = []
             for(let i = 0 ; i < data.directions[0][params.areaId-1].length;i++){
-                if(i!=params.paramId-1){
+                if(i!==params.paramId-1){
                     dirHolder.push( <Dropdown.Item key={i} onClick={(e)=>{
                         fetch('http://localhost:1337/cictdrive/move-file',{
                             method:'POST',
@@ -57,7 +57,7 @@ function FileRow(props){
                                 fileId:props.fileId
                             })
                         }).then(data=>data.json()).then(data=>{
-                            if(data.mess=="Success"){
+                            if(data.mess==="Success"){
                                 window.location.href='/home/level/'+params.id+'/'+params.phaseId+'/'+params.areaId+'/'+data.newParam
                             }
                         })
@@ -78,11 +78,12 @@ function FileRow(props){
             },
             body: JSON.stringify({
                 'path':props.path,
-                'filename':props.filename
+                'filename':props.filename,
+                'id':props.fileId
             }),
         }).then(data=>data.json()).then(data=>
         {
-           if(data.message=="ok"){
+           if(data.message==="ok"){
                alert('File is Succesfully deleted')
                window.location.href='/home/level/'+props.path
            } 
@@ -125,7 +126,7 @@ function FileRow(props){
 
         }).then(data=>data.json()).then(data=>
             {
-                if(data.mess=="Success"){
+                if(data.mess==="Success"){
                     alert('File is Succesfully Renamed')
                     window.location.href='/home/level/'+props.path
                 } 

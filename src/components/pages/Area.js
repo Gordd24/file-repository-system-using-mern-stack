@@ -2,20 +2,30 @@ import Navigation from '../page-components/Navigation'
 import ParamCard from '../page-components/ParamCard';
 import React,{useState,useEffect} from 'react';
 import { useParams } from 'react-router-dom';
-
+import { Modal } from 'react-bootstrap';
 
 function Area(props){
 
     const params = useParams()
     const[parameterComps,setParameterComps] = useState([])
     const[parameters,setParameters] = useState([])
+    const[paramName,setParamName] = useState('')
+
+    const [show, setShow] = useState(false);
+    
+    const handleClose = () => 
+    {
+        setParamName('')
+        setShow(false)
+    }
+    const handleShow = () => setShow(true);
 
     useEffect(()=>{
 
         if(parameters.length!==0){
             let parameterHolder = [];
             for(let i=parameterHolder.length+1;i<parameters.length+1;i++){
-                 parameterHolder.push(<ParamCard desc={'Parameter '+(i)} parameter={i} area={params.areaId} level={params.id} phase={params.phaseId} key={i}/>);
+                 parameterHolder.push(<ParamCard desc={parameters[i-1]} parameter={parameters[i-1]} parameterNo={i} area={params.areaId} level={params.id} phase={params.phaseId} key={i}/>);
             }
             setParameterComps(parameterHolder);
         }else{
@@ -51,7 +61,8 @@ function Area(props){
                 'level':params.id,
                 'phase':params.phaseId,
                 'area':params.areaId,
-                'parameter':parameters.length+1
+                'parameter':parameters.length+1,
+                'paramName':paramName
             })
         }).then(data => data.json())
         .then(data => {
@@ -66,6 +77,27 @@ function Area(props){
 
     return(
         <div className="h-100">
+
+                    <Modal show={show} onHide={handleClose} aria-labelledby="contained-modal-title-vcenter" centered>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Create Parameter</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                        <form onSubmit={createParam}>
+                            <div className='row justify-content-center mb-3'>
+                                <div className='col-10'>
+                                    <input type="text" className="form-control" placeholder='Ex. Paramater A' value={paramName} onChange={(e)=> setParamName(e.target.value)}/>  
+                                </div>
+                            </div>
+                            <div className='row justify-content-center mb-3'>
+                                <div className='col-10'>
+                                    <button type="submit" className="form-control btn btn-dark">Create</button>
+                                </div>
+                            </div>     
+                        </form>
+                        </Modal.Body>
+                    </Modal>
+
                     <div className="row navbar-static-top">
                         <div className="col">
                             <Navigation />
@@ -96,7 +128,7 @@ function Area(props){
 
                                     <div className='row text-light justify-content-center p-2' style={{ height: '92.5%'}}>
                                         <div className='col-12'>
-                                            <button className='btn-dark form-control my-2' onClick={createParam}>Create Parameter</button>
+                                            <button className='btn-dark form-control my-2' onClick={handleShow}>Create Parameter</button>
                                         </div>
                                     </div>
 
