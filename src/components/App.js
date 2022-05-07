@@ -6,6 +6,8 @@ import Phase from './pages/Phase';
 import Area from './pages/Area';
 import Parameter from './pages/Parameter';
 import Registration from './pages/Registration';
+import UpdateProfile from './pages/UpdateProfile';
+import Logs from './pages/Logs';
 import { BrowserRouter, Route, Routes} from 'react-router-dom';
 import { RedirectHome,RequireAuth,AdminCheck} from './pages/RequireAuth'
 
@@ -22,6 +24,8 @@ function App() {
             <Route path='/home/level/:id/:phaseId/:areaId' element={<RequireAuth><Area/></RequireAuth>}></Route>
             <Route path='/home/level/:id/:phaseId/:areaId/:paramId' element={<RequireAuth><Parameter/></RequireAuth>}></Route>
             <Route path='/registration' element={<RequireAuth><AdminCheck><Registration/></AdminCheck></RequireAuth>}></Route>
+            <Route path='/profile' element={<RequireAuth><AdminCheck><UpdateProfile/></AdminCheck></RequireAuth>}></Route>
+            <Route path='/logs' element={<RequireAuth><AdminCheck><Logs/></AdminCheck></RequireAuth>}></Route>
             {/* <Route path='/testing' element={<Testing/>}></Route> */}
           </Routes>
         </BrowserRouter>

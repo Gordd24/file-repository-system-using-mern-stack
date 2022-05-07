@@ -1,3 +1,12 @@
 .error {
     color: red;   
 }
+
+
+.blurry{
+/* From https://css.glass */
+background: rgba(255, 255, 255,  0.44);
+backdrop-filter: blur(3.4px);
+-webkit-backdrop-filter: blur(3.4px);
+border: 1px solid rgba(255, 255, 255, 0.3);
+}
