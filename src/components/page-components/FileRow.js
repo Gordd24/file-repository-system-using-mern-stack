@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Axios from 'axios'
 import FileDownload from 'js-file-download'
-import { Modal,Button,ButtonGroup,Dropdown } from 'react-bootstrap';
+import { DropdownButton, Modal,Card,Dropdown } from 'react-bootstrap';
+import bg1 from '../img/bg1.png'
 import jwt_decode from 'jwt-decode'
 function FileRow(props){
     const user = localStorage.getItem('user')
@@ -143,9 +144,9 @@ function FileRow(props){
              })
     }
     return(
-        <tr>
-                    
-             <Modal show={show} onHide={handleClose} aria-labelledby="contained-modal-title-vcenter" centered>
+            <div className="col-12 col-sm-6 col-md-4 col-xl-3">
+
+<Modal show={show} onHide={handleClose} aria-labelledby="contained-modal-title-vcenter" centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Move File To</Modal.Title>
                 </Modal.Header>
@@ -183,18 +184,29 @@ function FileRow(props){
                 </form>
                 </Modal.Body>
             </Modal>
+                            <Card
+                            text={'dark'}
+                            className="mb-2 shadow"
+                            >
+                                <Card.Header bg={'secondary'} className="bg-dark text-light">{props.filename}</Card.Header>
+                                <Card.Body style={{ backgroundImage: `url(${bg1})`,  backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundPosition: 'center'}}>
+                                    <Card.Text className="m-4" style={{textShadow: '4px 4px 24px rgba(251,251,251,1)'}}>
+                                    </Card.Text>
+                                </Card.Body>
+                                <Card.Footer>
+                                    <div className='d-flex flex-row-reverse'>
+                                            <DropdownButton id="dropdown-basic-button" variant='dark' title='Action'>
+                                                <Dropdown.Item onClick={handleShowRename}>Rename</Dropdown.Item>
+                                                <Dropdown.Item onClick={del}>Delete</Dropdown.Item>
+                                                <Dropdown.Item onClick={handleShow}>Move</Dropdown.Item>
+                                                <Dropdown.Item onClick={downloadFile}>Download</Dropdown.Item>
+                                            </DropdownButton>
+                                    </div>
+                                     
+                                </Card.Footer>
+                            </Card>
 
-            <th scope="row">{props.filename}</th>
-            <td>{props.filetype}</td>
-            <td>
-                <ButtonGroup aria-label="First group">
-                    <Button variant="outline-dark" onClick={handleShowRename}>Rename</Button>
-                    <Button variant="outline-dark" onClick={del}>Delete</Button>
-                    <Button variant="outline-dark" onClick={handleShow}>Move</Button>
-                    <Button variant="outline-dark" onClick={downloadFile}>Download</Button>
-                </ButtonGroup>
-            </td>
-        </tr>
+            </div>
     )
 }
 

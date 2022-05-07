@@ -1,3 +1,5 @@
+import { Card } from 'react-bootstrap';
+import bg1 from '../img/bg1.png'
 function AreaCard(props){
 
     function viewArea(){
@@ -5,20 +7,21 @@ function AreaCard(props){
     }
     
     return(
-                <div className="col-12 col-sm-10 shadow overflow-hidden my-2" onClick={viewArea} style={{height:'20vh'}}>
 
-                        <div className="row border-bottom text-light rounded bg-dark" >
-                            <div className="col">
-                                <h4>Area {props.area}</h4>
-                            </div>
-                        </div>
-
-                        <div className="row">
-                            <div className="col p-3">
-                                {props.desc}
-                            </div>
-                        </div>
-
+                <div className="col-12 col-sm-6 col-md-3" >
+                    <Card
+                    onClick={viewArea}
+                    text={'dark'}
+                    className="mb-2 shadow"
+                   
+                    >
+                    <Card.Header bg={'secondary'} className="bg-dark text-light overflow-hidden">Area {props.area}</Card.Header>
+                    <Card.Body style={{ backgroundImage: `url(${bg1})`,  backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundPosition: 'center', height:'10vh', overflow:'hidden', fontWeight:'bold'}}>
+                        <Card.Text className='text-light'>
+                         {props.desc}
+                        </Card.Text>
+                    </Card.Body>
+                    </Card>
                 </div>
     );
 }

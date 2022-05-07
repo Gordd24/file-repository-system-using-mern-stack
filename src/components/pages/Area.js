@@ -2,11 +2,12 @@ import Navigation from '../page-components/Navigation'
 import ParamCard from '../page-components/ParamCard';
 import React,{useState,useEffect} from 'react';
 import { useParams } from 'react-router-dom';
+import { Modal,Dropdown,DropdownButton } from 'react-bootstrap';
+import bg4 from '../img/bg4.png'
+import bg6 from '../img/bg6.png'
 import jwt_decode from 'jwt-decode'
-import { Modal } from 'react-bootstrap';
 
 function Area(props){
-
     const user = localStorage.getItem('user')
     const object = JSON.parse(user)
     const accessToken = object.accessToken
@@ -69,8 +70,7 @@ function Area(props){
                 'phase':params.phaseId,
                 'area':params.areaId,
                 'parameter':parameters.length+1,
-                'paramName':paramName,
-                personName
+                'paramName':paramName
             })
         }).then(data => data.json())
         .then(data => {
@@ -85,7 +85,8 @@ function Area(props){
 
     return(
         <div className="h-100">
-            <Modal show={show} onHide={handleClose} aria-labelledby="contained-modal-title-vcenter" centered>
+
+                    <Modal show={show} onHide={handleClose} aria-labelledby="contained-modal-title-vcenter" centered>
                         <Modal.Header closeButton>
                             <Modal.Title>Create Parameter</Modal.Title>
                         </Modal.Header>
@@ -104,6 +105,7 @@ function Area(props){
                         </form>
                         </Modal.Body>
                     </Modal>
+
                     <div className="row navbar-static-top">
                         <div className="col">
                             <Navigation />
@@ -113,19 +115,35 @@ function Area(props){
                     <div className="row m-2">
                         <div className="col d-flex flex-column">
 
-                            <div className="row border p-1">
-                                <div className="col p-1">
-                                    <a href='/home' className='mx-2'>Levels</a> 
-                                    <a href={'/home/level/'+params.id} className='mx-2'>Level{' '+params.id}</a> 
-                                    <a href={'/home/level/'+params.id+'/'+params.phaseId} className='mx-2'>Phase{' '+params.phaseId}</a> 
-                                    <a href={'/home/level/'+params.id+'/'+params.phaseId+'/'+params.areaId} className='mx-2'>Area{' '+params.areaId}</a> 
+                            <div className="row border border-secondary" style={{ backgroundImage: `url(${bg6})`,  backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundPosition: 'center'}}>
+                                <div className="col-8 col-sm-8 col-md-9">
+                                    <div className='d-block d-sm-none'>
+                                        <DropdownButton id="dropdown-item-button" variant='dark' title="">
+                                            <Dropdown.Item href='/home'>Levels /</Dropdown.Item>
+                                            <Dropdown.Item href={'/home/level/'+params.id}>Levels / Level{' '+params.id}</Dropdown.Item>
+                                            <Dropdown.Item href={'/home/level/'+params.id+'/'+params.phaseId}>Levels / Level{' '+params.id} / Phase{' '+params.phaseId}</Dropdown.Item>
+                                            <Dropdown.Item href={'/home/level/'+params.id+'/'+params.phaseId+'/'+params.areaId} className="bg-secondary text-light"><strong>Levels / Level{' '+params.id} / Phase{' '+params.phaseId} / Area{' '+params.areaId}</strong></Dropdown.Item>
+                                        </DropdownButton>
+                                    </div>
+                                    <div className='d-none d-sm-block'>
+                                        <a href='/home' className='btn text-decoration-underline text-secondary'><strong>Levels</strong></a> 
+                                        <strong>-</strong>
+                                        <a href={'/home/level/'+params.id} className='btn text-decoration-underline text-secondary'><strong>Level{' '+params.id}</strong></a> 
+                                        <strong>-</strong>
+                                        <a href={'/home/level/'+params.id+'/'+params.phaseId} className='btn text-decoration-underline text-secondary'><strong>Phase{' '+params.phaseId}</strong></a>
+                                        <strong>-</strong>
+                                        <a href={'/home/level/'+params.id+'/'+params.phaseId+'/'+params.areaId} className='btn text-decoration-underline text-dark'><strong>Area{' '+params.areaId}</strong></a> 
+                                    </div>
+                                </div>
+                                <div  onClick={handleShow} className='btn col-4 col-sm-4 col-md-3 d-xs-block d-sm-block d-md-block d-lg-none justify-content-left bg-dark text-light'>
+                                    Create Parameter
                                 </div>
                             </div>
 
 
                             <div className="row border mt-1" style={{ height: '84vh'}}>
 
-                                <div className="col-2 shadow d-none d-lg-block">
+                                <div className="col-2 shadow d-none d-lg-block border border-secondary" style={{ backgroundImage: `url(${bg4})`,  backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundPosition: 'center'}}>
                                     <div className='row bg-dark text-light align-items-center' style={{ height: '7.5%'}}>
                                         <div className='col'>
                                             Area Paramaters
@@ -134,7 +152,7 @@ function Area(props){
 
                                     <div className='row text-light justify-content-center p-2' style={{ height: '92.5%'}}>
                                         <div className='col-12'>
-                                        <button className='btn-dark form-control my-2' onClick={handleShow}>Create Parameter</button>
+                                            <button className='btn-dark form-control my-2' onClick={handleShow}>Create Parameter</button>
                                         </div>
                                     </div>
 
@@ -142,21 +160,8 @@ function Area(props){
 
                                 <div className="col-12 col-lg-10">
 
-                                    <div className="row shadow d-flex d-xs-block d-sm-block d-lg-none d-xl-none align-items-center" style={{ height: '8vh'}}>
-                                        <div className="col-12">
-
-                                            <div className="row justify-content-center">
-                                                <div className="col-6 col-sm-4">
-                                                    <button className='btn-dark form-control shadow'>Create Phase</button>
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-
-                                    <div className="row justify-content-center p-3 overflow-auto" style={{ height: '78vh'}}>
+                                    <div className="row p-3 overflow-auto" style={{ height: '80vh'}}>
                                         {parameterComps}
-
                                     </div>
 
                                 </div>

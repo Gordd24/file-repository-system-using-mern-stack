@@ -1,19 +1,19 @@
 import Field from '../page-components/Field';
 import Button from '../page-components/Button';
 import React,{useState,useEffect} from 'react';
-import logout from '../page-components/Logout';
+import Navigation from '../page-components/Navigation'
 import "../css/style.css"
 import axios from 'axios'
+import bg9 from '../img/bg9.png'
 import jwt_decode from 'jwt-decode'
 
 function Registration(){
-    
+       
     const user = localStorage.getItem('user')
     const object = JSON.parse(user)
     const accessToken = object.accessToken
     const decodeToken = jwt_decode(accessToken)
     const personName = decodeToken.fName + ' ' + decodeToken.lName
-    
 
     const[fName,setFName] = useState('');
     const[mName,setMName] = useState('');
@@ -174,45 +174,26 @@ function Registration(){
     return(
         <div className="h-100">
 
-                <div className="row navbar-static-top">
-                    <div className="col">
-                        
-                        <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-                            <div className="container-fluid">
-                                <a className="navbar-brand" href="/home">CICT Drive</a>
-
-                                <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-                                    <span className="navbar-toggler-icon"></span>
-                                </button>
-
-                                <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
-                                    <div className="navbar-nav">
-                                        <a className="nav-link" href="/home">Home</a>
-                                        <a className="nav-link active" href="/registration">Registration</a>
-                                        <a className="nav-link" href="#">Logs</a>
-                                        <li className="nav-item dropdown">
-                                            <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                My Account
-                                            </a>
-                                            <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
-                                                <li><a className="dropdown-item" href="#">Update</a></li>
-                                                <li><a className="dropdown-item" onClick={logout} href='#'>Sign Out</a></li>
-                                            </ul>
-                                        </li>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </nav>   
-
+                    <div className="row navbar-static-top">
+                        <div className="col">
+                            <Navigation />
                         </div>
                     </div>
 
 
                     <div className='row m-2 shadow-lg' style={{height: '90%'}}>
 
-                        <div className='col-md-6 col-sm-12 d-none d-md-block bg-secondary'>
-                            
+                        <div className='col-md-6 col-sm-12 d-none d-md-block bg-dark' style={{ backgroundImage: `url(${bg9})`,  backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundPosition: 'center'}}>
+                            <div className='row justify-content-right'>
+                                <div className='col p-5 mt-5'>
+                                    <h1 className='text-light'>
+                                        CICT Drive Registration
+                                    </h1>
+                                    <h4 className='text-light m-4'>
+                                       Create and Assign Faculty Members Account in just few easy steps!
+                                    </h4>
+                                </div>
+                            </div>
                         </div>
 
                         <div className='col-md-6 col-sm-12'>

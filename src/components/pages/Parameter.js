@@ -2,9 +2,10 @@ import Navigation from '../page-components/Navigation'
 import FileRow from '../page-components/FileRow';
 import React,{useState,useEffect} from 'react';
 import { useParams } from 'react-router-dom';
-import { Modal,Button,ButtonGroup,Dropdown } from 'react-bootstrap';
+import { Modal,Dropdown,DropdownButton } from 'react-bootstrap';
+import bg4 from '../img/bg4.png'
+import bg6 from '../img/bg6.png'
 import jwt_decode from 'jwt-decode'
-
 
 function Parameter(props){
     const user = localStorage.getItem('user')
@@ -134,21 +135,39 @@ function Parameter(props){
 
                     <div className="row m-2">
                         <div className="col d-flex flex-column">
-
-                            <div className="row border p-1">
-                                <div className="col p-1">
-                                    <a href='/home' className='mx-2'>Levels</a> 
-                                    <a href={'/home/level/'+params.id} className='mx-2'>Level{' '+params.id}</a> 
-                                    <a href={'/home/level/'+params.id+'/'+params.phaseId} className='mx-2'>Phase{' '+params.phaseId}</a> 
-                                    <a href={'/home/level/'+params.id+'/'+params.phaseId+'/'+params.areaId} className='mx-2'>Area{' '+params.areaId}</a> 
-                                    <a href={'/home/level/'+params.id+'/'+params.phaseId+'/'+params.areaId+'/'+params.paramId} className='mx-2'>Parameter{' '+params.paramId    }</a> 
+                            <div className="row border border-secondary" style={{ backgroundImage: `url(${bg6})`,  backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundPosition: 'center'}}>
+                                <div className="col-8 col-sm-8 col-md-9">
+                                    <div className='d-block d-md-none'>
+                                        <DropdownButton variant='dark' title="">
+                                            <Dropdown.Item href='/home'>Levels /</Dropdown.Item>
+                                            <Dropdown.Item href={'/home/level/'+params.id}>Levels / Level{' '+params.id}</Dropdown.Item>
+                                            <Dropdown.Item href={'/home/level/'+params.id+'/'+params.phaseId}>Levels / Level{' '+params.id} / Phase{' '+params.phaseId}</Dropdown.Item>
+                                            <Dropdown.Item href={'/home/level/'+params.id+'/'+params.phaseId+'/'+params.areaId}>Levels / Level{' '+params.id} / Phase{' '+params.phaseId} / Area{' '+params.areaId}</Dropdown.Item>
+                                            <Dropdown.Item href={'/home/level/'+params.id+'/'+params.phaseId+'/'+params.areaId+'/'+params.paramId}  className="bg-secondary text-light"><strong>Levels / Level{' '+params.id} / Phase{' '+params.phaseId} / Area{' '+params.areaId} / Parameter{' '+params.paramId}</strong></Dropdown.Item>
+                                        </DropdownButton>
+                                    </div>
+                                    <div className='d-none d-md-block'>
+                                        <a href='/home' className='btn text-decoration-underline text-secondary'><strong>Levels</strong></a> 
+                                        <strong>-</strong>
+                                        <a href={'/home/level/'+params.id} className='btn text-decoration-underline text-secondary'><strong>Level{' '+params.id}</strong></a> 
+                                        <strong>-</strong>
+                                        <a href={'/home/level/'+params.id+'/'+params.phaseId} className='btn text-decoration-underline text-secondary'><strong>Phase{' '+params.phaseId}</strong></a>
+                                        <strong>-</strong>
+                                        <a href={'/home/level/'+params.id+'/'+params.phaseId+'/'+params.areaId} className='btn text-decoration-underline text-secondary'><strong>Area{' '+params.areaId}</strong></a> 
+                                        <strong>-</strong>
+                                        <a href={'/home/level/'+params.id+'/'+params.phaseId+'/'+params.areaId+'/'+params.paramId} className='btn text-decoration-underline text-dark'><strong>Parameter{' '+params.paramId}</strong></a> 
+                                    </div>
                                 </div>
+                                <div  onClick={handleShow} className='btn col-4 col-sm-4 col-md-3 d-xs-block d-sm-block d-md-block d-lg-none justify-content-left bg-dark text-light'>
+                                    Upload File
+                                </div>
+                
                             </div>
 
 
                             <div className="row border mt-1" style={{ height: '84vh'}}>
 
-                                <div className="col-2 shadow d-none d-lg-block">
+                                <div className="col-2 shadow d-none d-lg-block border border-secondary" style={{ backgroundImage: `url(${bg4})`,  backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundPosition: 'center'}}>
                                     <div className='row bg-dark text-light align-items-center' style={{ height: '7.5%'}}>
                                         <div className='col'>
                                             Paramater Files
@@ -163,42 +182,12 @@ function Parameter(props){
                                         </div>
                                     </div>
 
-                                
-
                                 </div>
 
                                 <div className="col-12 col-lg-10">
-
-                                    <div className="row shadow d-flex d-xs-block d-sm-block d-lg-none d-xl-none align-items-center" style={{ height: '8vh'}}>
-                                        <div className="col-12">
-
-                                            <div className="row justify-content-center">
-                                                <div className="col-6 col-sm-4">
-                                                    <button className='btn-dark form-control shadow'>Upload File</button>
-                                                </div>
-                                            </div>
-
+                                        <div className="row p-3 overflow-auto" style={{ height: '80vh'}}>
+                                            {files}
                                         </div>
-                                    </div>
-
-                                    <div className="row justify-content-center p-3 overflow-auto" style={{ height: '78vh'}}>
-                                      
-                                        <table className="table">
-                                            <thead className="bg-dark text-light">
-                                                <tr>
-                                                    <th scope="col">Filename</th>
-                                                    <th scope="col">Type</th>
-                                                    <th scope="col"></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {files}
-                                            </tbody>
-                                        </table>
-
-
-                                    </div>
-
                                 </div>
                             </div>
 
