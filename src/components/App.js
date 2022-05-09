@@ -24,8 +24,8 @@ function App() {
             <Route path='/home/level/:id/:phaseId/:areaId' element={<RequireAuth><Area/></RequireAuth>}></Route>
             <Route path='/home/level/:id/:phaseId/:areaId/:paramId' element={<RequireAuth><Parameter/></RequireAuth>}></Route>
             <Route path='/registration' element={<RequireAuth><AdminCheck><Registration/></AdminCheck></RequireAuth>}></Route>
-            <Route path='/profile' element={<RequireAuth><AdminCheck><UpdateProfile/></AdminCheck></RequireAuth>}></Route>
-            <Route path='/logs' element={<RequireAuth><AdminCheck><Logs/></AdminCheck></RequireAuth>}></Route>
+            <Route path='/profile' element={<RequireAuth><UpdateProfile/></RequireAuth>}></Route>
+            <Route path='/logs' element={<RequireAuth><Logs/></RequireAuth>}></Route>
             {/* <Route path='/testing' element={<Testing/>}></Route> */}
           </Routes>
         </BrowserRouter>

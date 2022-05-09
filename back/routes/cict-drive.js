@@ -48,14 +48,12 @@ const verify = (request, response, next) => {
 }
 //registration
 router.post("/sign_up", async (request, response) =>{
-  
   const userExist = await UserModel.findOne({
     username: request.body.username
   })
   const emailExist = await UserModel.findOne({
     email: request.body.email
   })
-  
     try{
 
       const newPassword = await  bcrypt.hash(request.body.password,10)
@@ -93,19 +91,106 @@ router.post("/sign_up", async (request, response) =>{
           }
           response.status(409).json({message: userMsg + "_" + emailMsg})
         }
-        // else if(request.body.password !== request.body.confirmPassword){
-        //   response.status(409).json({message: 'passwords dont matches'})
-        // }
         else{
           response.json({status: err, error:'something wrong'})
         }
-      console.log(err)
-      
+      console.log(err) 
     }
-  
-   
   })
 
+  router.post("/update_name", async (request, response) =>{
+    const data = request.body
+    let errors = []
+    const user = await UserModel.findOne({
+      _id: data.id,
+    })
+    
+    
+     if(data.fName.length === 0|| data.lName.length === 0){
+        if(data.fName.length===0)errors.push('First name is required')
+        if(data.lName.length===0)errors.push('Last name is required')
+        response.status(400).json({errors})
+        
+     }else{
+      const accessToken = jwt.sign({
+        id: user._id,
+        fName: data.fName,
+        mName: data.mName,
+        lName: data.lName,
+        username: user.username,
+        level: user.level,
+        phase: user.phase,
+        area: user.area,
+        type: user.type
+      },"sampleSecretKey",{
+        expiresIn:"15m"
+      })
+      const refreshToken = jwt.sign({
+        id: user._id,
+        fName: data.fName,
+        mName: data.mName,
+        lName: data.lName,
+        username: user.username,
+        level: user.level,
+        phase: user.phase,
+        area: user.area,
+        type: user.type
+      },"sampleRefreshSecretKey")
+      const logsModel = await new LogsModel({
+        data: user.fName + ' ' + user.lName + ' ' +'has updated their name to'+ ' ' + 
+        data.fName + ' ' + data.mName+ ' ' + data.lName, 
+      })
+      logsModel.save()
+
+      await UserModel.findByIdAndUpdate(data.id,{
+        fName: data.fName,
+        mName: data.mName,
+        lName: data.lName
+      })
+      const findTokenInDb = await RefreshTokenModel.findOne({user:user._id})
+      if(!findTokenInDb){
+        const refreshTokenModel = new RefreshTokenModel({
+            token: refreshToken,
+            user: user._id
+        })
+        await refreshTokenModel.save();
+      }else{
+        //new Token
+        await RefreshTokenModel.findOneAndUpdate({user:user._id},{token:refreshToken},{new:true})
+      }
+      response.status(200).json({
+        accessToken,refreshToken
+      })
+     }
+  })
+  router.post("/update_password", async (request, response) =>{
+      const data = request.body
+      const id = data.id
+      let errors = []
+      const user = await UserModel.findOne({
+        _id: data.id,
+      })
+      if(data.password.length===0||data.confirmPassword.length===0){
+        if(data.password.length===0)errors.push('Password is required')
+        if(data.confirmPassword.length===0)errors.push('Confirm password is required')
+        response.status(400).json({errors})
+      }
+      else if(data.password !== data.confirmPassword){
+        errors.push('Passwords dont match')
+        response.status(401).json({errors})
+      }else{
+        const logsModel = await new LogsModel({
+          data: user.fName + ' ' + user.lName + ' ' +'has updated their password',
+        })
+        logsModel.save()
+        const newPassword = await  bcrypt.hash(data.password,10)
+        await UserModel.findByIdAndUpdate(data.id,{
+          password: newPassword,
+        })
+        response.status(200).json({ message : 'Update Success'})
+      }
+      
+  })
 
 //sign_in
   /* router.post("/sign_in", async (request, response) => {
@@ -131,8 +216,6 @@ router.post("/sign_up", async (request, response) =>{
     }
   }); */
 
- 
-  
   //take token from  user
   router.post("/refresh", (request, response)=>{
     const refreshToken = request.body.token
@@ -160,21 +243,24 @@ router.post("/sign_up", async (request, response) =>{
     return jwt.sign({
         id: user._id,
         fName: user.fName,
+        mName: user.mName,
         lName: user.lName,
         username: user.username,
         level: user.level,
         phase: user.phase,
         area: user.area,
         type: user.type
+        
       },"sampleSecretKey",{
         expiresIn:"15m"
       })
   }
 
-  const generateRefreshToken = user => {
+  const generateRefreshToken = (user) => {
     return jwt.sign({
         id: user._id,
         fName: user.fName,
+        mName: user.mName,
         lName: user.lName,
         username: user.username,
         level: user.level,

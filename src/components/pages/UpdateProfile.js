@@ -10,25 +10,61 @@ import jwt_decode from 'jwt-decode'
 
 function UpdateProfile(){
 
-    const[fName,setFName] = useState('');
-    const[mName,setMName] = useState('');
-    const[lName,setLName] = useState('');
+    const user = localStorage.getItem('user')
+    const object = JSON.parse(user)
+    const accessToken = object.accessToken
+    const decodeToken = jwt_decode(accessToken)
+
+    
+    const[fName,setFName] = useState(decodeToken.fName);
+    const[mName,setMName] = useState(decodeToken.mName);
+    const[lName,setLName] = useState(decodeToken.lName);
+    const id = decodeToken.id
     const[password,setPassword] = useState('');
     const[confirmPassword,setConfirmPassword] = useState('');
-    function updateName(e){
+
+    const updateName = async (e)=>{
         e.preventDefault()
-        console.log('First Name', fName)
-        console.log('Last Name', lName)
-        console.log('Middle Name', mName)
-
+        try{
+            const response = await axios.post('http://localhost:1337/cictdrive/update_name',({
+                fName, mName, lName, id
+            }))
+            
+            if(response.status ===200){
+                console.log(response.data)
+                localStorage.setItem("user",JSON.stringify(response.data))
+                window.location.reload()
+                
+            }else{
+                console.log(response.data)
+                //valdation dito
+            }
+            
+        }catch(error){
+            console.log(error)
+        }
     }
-
-    function updatePassword(e){
+    const updatePassword = async (e)=>{
         e.preventDefault()
-        console.log('Password', password)
-        console.log('Confirm Password', confirmPassword)
-
+        try {
+            const response = await axios.post('http://localhost:1337/cictdrive/update_password',({
+                password, confirmPassword, id
+            }))
+            if (response.status === 200){
+                alert(response.data.message)
+                window.location.reload()
+            }else{
+                console.log(response.data)
+            }
+            
+            window.location.reload()
+        } catch (error) {
+            console.log(error)
+        }
     }
+    
+
+    
 
     return(
         <div className="h-100">
@@ -62,7 +98,7 @@ function UpdateProfile(){
                                                         <form onSubmit={updateName}>
                                                             <h5 className='border-bottom my-2 p-1'>Name</h5>
                                                             <Field type="text" placeholder="First Name" required="*" setVal={setFName} val={fName}/>
-                                                            <Field type="text" placeholder="Middle Name" required="" setVal={setMName} val={mName}/>
+                                                            <Field type="text" placeholder="Middle Name" required="" setVal={setMName} val={mName ?? ""}/>
                                                             <Field type="text" placeholder="Last Name" required="*" setVal={setLName} val={lName}/>
 
                                                             <div className='row m-3 justify-content-center'>

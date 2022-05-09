@@ -70,7 +70,8 @@ function Area(props){
                 'phase':params.phaseId,
                 'area':params.areaId,
                 'parameter':parameters.length+1,
-                'paramName':paramName
+                'paramName':paramName,
+                personName
             })
         }).then(data => data.json())
         .then(data => {
