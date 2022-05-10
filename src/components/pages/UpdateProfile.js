@@ -61,6 +61,7 @@ function UpdateProfile(){
             if(Object.keys(nameErrors).length === 0){
                 const response =  axios.post('http://localhost:1337/cictdrive/update_name',({
                     fName, mName, lName, id
+                }))
                 
                 if(response.status ===200){
                     console.log(response.data)
