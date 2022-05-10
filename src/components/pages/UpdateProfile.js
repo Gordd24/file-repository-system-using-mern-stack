@@ -21,43 +21,77 @@ function UpdateProfile(){
     const[lName,setLName] = useState(decodeToken.lName);
     const id = decodeToken.id
     const[password,setPassword] = useState('');
-    const[confirmPassword,setConfirmPassword] = useState('');
+    const[confirmPassword,setConfirmPassword] = useState('')
+    const [nameErrors, setNameErrors] = useState({})
+    const [passwordErrors, setPasswordErrors] = useState({})
 
-    const updateName = async (e)=>{
-        e.preventDefault()
-        try{
-            const response = await axios.post('http://localhost:1337/cictdrive/update_name',({
-                fName, mName, lName, id
-            }))
-            
-            if(response.status ===200){
-                console.log(response.data)
-                localStorage.setItem("user",JSON.stringify(response.data))
-                window.location.reload()
-                
-            }else{
-                console.log(response.data)
-                //valdation dito
+    const validateName = (fName,lName)=>{
+        const errors = {}
+
+        if (!fName){
+            errors.fName="First name is required"
+        }
+        if (!lName){
+            errors.lName="Last name is required"
+        }
+        return errors
+    }
+
+    const validatePassword = (password,confirmPassword)=>{
+        const errors = {}
+
+        if (!password || !confirmPassword){
+            if(!password)errors.password="Password is required"
+            if(!confirmPassword)errors.confirmPassword="Confirm Password is required" 
+        }else{
+            if(password !== confirmPassword){
+                errors.password="Passwords don't match"
+                errors.confirmPassword="Passwords don't match"
             }
-            
+        }
+        
+        return errors
+    }
+
+    const updateName = (e)=>{
+        e.preventDefault()
+        setNameErrors(validateName(fName,lName))
+        
+        try{
+            if(Object.keys(nameErrors).length === 0){
+                const response =  axios.post('http://localhost:1337/cictdrive/update_name',({
+                    fName, mName, lName, id
+                
+                if(response.status ===200){
+                    console.log(response.data)
+                    localStorage.setItem("user",JSON.stringify(response.data))
+                    window.location.reload()
+                    
+                }else{
+                    console.log(response.data)
+                    //valdation dito
+                }
+            }
         }catch(error){
             console.log(error)
         }
     }
-    const updatePassword = async (e)=>{
+    const updatePassword = (e)=>{
         e.preventDefault()
+        setPasswordErrors(validatePassword(password,confirmPassword))
         try {
-            const response = await axios.post('http://localhost:1337/cictdrive/update_password',({
-                password, confirmPassword, id
-            }))
-            if (response.status === 200){
-                alert(response.data.message)
+            if(Object.keys(passwordErrors).length === 0){
+                const response =  axios.post('http://localhost:1337/cictdrive/update_password',({
+                    password, confirmPassword, id
+                }))
+                if (response.status === 200){
+                    alert(response.data.message)
+                    window.location.reload()
+                }else{
+                    console.log(response.data)
+                }
                 window.location.reload()
-            }else{
-                console.log(response.data)
             }
-            
-            window.location.reload()
         } catch (error) {
             console.log(error)
         }
@@ -97,9 +131,9 @@ function UpdateProfile(){
                                                     <div className='col'>
                                                         <form onSubmit={updateName}>
                                                             <h5 className='border-bottom my-2 p-1'>Name</h5>
-                                                            <Field type="text" placeholder="First Name" required="*" setVal={setFName} val={fName}/>
+                                                            <Field error={nameErrors.fName} type="text" placeholder="First Name" required="*" setVal={setFName} val={fName}/>
                                                             <Field type="text" placeholder="Middle Name" required="" setVal={setMName} val={mName ?? ""}/>
-                                                            <Field type="text" placeholder="Last Name" required="*" setVal={setLName} val={lName}/>
+                                                            <Field error={nameErrors.lName} type="text" placeholder="Last Name" required="*" setVal={setLName} val={lName}/>
 
                                                             <div className='row m-3 justify-content-center'>
                                                                 <div className='col-5'>
@@ -115,8 +149,8 @@ function UpdateProfile(){
                                                     <div className='col'>
                                                         <form onSubmit={updatePassword}>
                                                             <h5 className='border-bottom my-2 p-1'>Password</h5>
-                                                                <Field type="password" placeholder="Password" required="*" setVal={setPassword} val={password}/>
-                                                                <Field type="password" placeholder="Confirm Password" required="*" setVal={setConfirmPassword} val={confirmPassword}/>
+                                                                <Field  error={passwordErrors.password} type="password" placeholder="Password" required="*" setVal={setPassword} val={password}/>
+                                                                <Field  error={passwordErrors.confirmPassword} type="password" placeholder="Confirm Password" required="*" setVal={setConfirmPassword} val={confirmPassword}/>
                                                             <div className='row m-3 justify-content-center'>
                                                                 <div className='col-5'>
                                                                 <button type='submit' value='fullname' className='btn btn-primary form-control'>Save Changes</button>
