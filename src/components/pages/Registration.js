@@ -105,7 +105,7 @@ function Registration(){
             }
             
         }else if (!password || !confirmPassword){
-            if(!password){errors.password="Password is required"}
+            if(!password)errors.password="Password is required"
             if(!confirmPassword)errors.confirmPassword="Confirm Password is required" 
         }
         
@@ -127,13 +127,13 @@ function Registration(){
     }
 
 
+
     function register(event){
         event.preventDefault();
         setFormErrors(validate(fName,lName,email,username,password,confirmPassword,level,phase,area,type))
         console.log(formErrors)
         if(Object.keys(formErrors).length === 0){
             //  console.log(fName,mName,lName,email,username,password,confirmPassword,level,phase,area,type)
-             
              fetch('http://localhost:1337/cictdrive/sign_up',{
                  method: 'POST',
                  headers: {
@@ -241,46 +241,6 @@ function Registration(){
                                                         <h5 className='my-2 p-1 border-bottom p-2'>Account Assignment</h5>
                                                         <div className="row m-3">
                                                             <div className="col">
-                                                                <select className="form-select" onChange={(e)=>setLevel(e.target.value)} value={level}>
-                                                                    <option>Choose Level </option>
-                                                                    {levels.map((getLevel)=>(
-                                                                        <option key = {getLevel._id} value = {getLevel.value}>Level {getLevel.value}</option>
-                                                                    ))}
-                                                                </select>
-                                                                <div className="error">{formErrors.level}</div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="row m-3">
-                                                            <div className="col">
-                                                                <select className="form-select" onChange={(e)=>setPhase(e.target.value)} value={phase}>
-                                                                    <option>Choose Phase</option>
-                                                                    {renderPhase()}
-                                                                   
-                                                                </select>
-                                                                <div className="error">{formErrors.phase}</div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="row m-3">
-                                                            <div className="col">
-                                                                <select className="form-select" onChange={(e)=>setArea(e.target.value)} value={area}>
-                                                                    <option>Choose Area Assignment</option>
-                                                                    <option value='1'>Area 1</option>
-                                                                    <option value="2">Area 2</option>
-                                                                    <option value="3">Area 3</option>
-                                                                    <option value="4">Area 4</option>
-                                                                    <option value="5">Area 5</option>
-                                                                    <option value="6">Area 6</option>
-                                                                    <option value="7">Area 7</option>
-                                                                    <option value="8">Area 8</option>
-                                                                    <option value="9">Area 9</option>
-                                                                    <option value="10">Area 10</option>
-                                                                </select>
-                                                                <div className="error">{formErrors.area}</div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="row m-3">
-                                                            <div className="col">
                                                                 <select className="form-select" onChange={(e)=>setType(e.target.value)} value={type}>
                                                                     <option>Choose Account Type</option>
                                                                     <option value='faculty'>Faculty</option>
@@ -290,7 +250,55 @@ function Registration(){
                                                                 <div className="error">{formErrors.type}</div>
                                                             </div>
                                                         </div>
+                                                        {
+                                                            type === "faculty" 
+                                                            &&
+                                                            <div>
+                                                                <div className="row m-3">
+                                                                    <div className="col">
+                                                                        <select className="form-select" onChange={(e)=>setLevel(e.target.value)} value={level}>
+                                                                            <option>Choose Level </option>
+                                                                            {levels.map((getLevel)=>(
+                                                                                <option key = {getLevel._id} value = {getLevel.value}>Level {getLevel.value}</option>
+                                                                            ))}
+                                                                        </select>
+                                                                        <div className="error">{formErrors.level}</div>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="row m-3">
+                                                                <div className="col">
+                                                                    <select className="form-select" onChange={(e)=>setPhase(e.target.value)} value={phase}>
+                                                                        <option>Choose Phase</option>
+                                                                        {renderPhase()}
+                                                                    
+                                                                    </select>
+                                                                    <div className="error">{formErrors.phase}</div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="row m-3">
+                                                                <div className="col">
+                                                                    <select className="form-select" onChange={(e)=>setArea(e.target.value)} value={area}>
+                                                                        <option>Choose Area Assignment</option>
+                                                                        <option value='1'>Area 1</option>
+                                                                        <option value="2">Area 2</option>
+                                                                        <option value="3">Area 3</option>
+                                                                        <option value="4">Area 4</option>
+                                                                        <option value="5">Area 5</option>
+                                                                        <option value="6">Area 6</option>
+                                                                        <option value="7">Area 7</option>
+                                                                        <option value="8">Area 8</option>
+                                                                        <option value="9">Area 9</option>
+                                                                        <option value="10">Area 10</option>
+                                                                    </select>
+                                                                    <div className="error">{formErrors.area}</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        }
+                                                        
+                                                        
 
+                                                        
                                                     </div>
                                                 </div>
                                             </div>
