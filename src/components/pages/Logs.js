@@ -3,9 +3,19 @@ import Navigation from '../page-components/Navigation'
 import "../css/style.css"
 import axios from 'axios'
 import bg9 from '../img/bg9.png'
-import { Tab,Sonnet, Tabs } from 'react-bootstrap';
+import { Tab, Tabs , Table, Dropdown, DropdownButton} from 'react-bootstrap';
+import LogFileRow from '../page-components/LogFileRow';
+import ActionRow from '../page-components/ActionRow';
 
 function Logs(){
+    const[upFiles,setUpFiles] = useState([])
+    const[areaFiles,setAreaFiles] = useState([])
+    const[actions,setActions] = useState([])
+    useEffect(()=>{
+        setUpFiles([<LogFileRow filename='text.txt' upload='12/12/12' key={1} />])
+        setAreaFiles([<LogFileRow filename='textFinal.txt' upload='12/12/12' key={1} />])
+        setActions([<ActionRow user="jasper" action="creates" date="10/10/10"/>])
+    },[])
 
     return(
         <div className="h-100">
@@ -40,25 +50,88 @@ function Logs(){
                                 <div className='col p-2 bg-light shadow '>
 
                                         
-                                            <Tabs defaultActiveKey="uploaded" id="uncontrolled-tab-example" className="mb-3">
+                                <Tabs defaultActiveKey="uploaded" id="uncontrolled-tab-example" className="mb-3">
                                                 <Tab eventKey="uploaded" title="Uploaded Files" className='px-3'>
                                                     <div className='row overflow-auto' style={{height: '80vh'}}>
                                                         <div className='col'>
+                                                        <div className='my-2'>
+                                                        <DropdownButton variant="dark" id="dropdown-basic-button" title="View By ">
+                                                            <Dropdown.Item href="#">This Day</Dropdown.Item>
+                                                            <Dropdown.Item href="#">This Week</Dropdown.Item>
+                                                            <Dropdown.Item href="#">This Month</Dropdown.Item>
+                                                        </DropdownButton>
+                                                        </div>
+                                                        <Table striped bordered hover>
+                                                        <thead>
+                                                            <tr>
+                                                            <th>Filename</th>
+                                                            <th>Upload Date</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                           {upFiles}
+                                                        </tbody>
+                                                        </Table>
 
                                                         </div>
                                                     </div>
                                                 </Tab>
-                                                <Tab eventKey="files" title="Area Files">
+                                                <Tab eventKey="files" title="Area Files" className='px-3'>
                                                     <div className='row overflow-auto' style={{height: '80vh'}}>
                                                         <div className='col'>
+                                                        <div className='my-2'>
+                                                            <DropdownButton id="dropdown-basic-button" variant="dark" title="Select Area">
+                                                                <Dropdown.Item href="#\">Area 1</Dropdown.Item>
+                                                                <Dropdown.Item href="#\">Area 2</Dropdown.Item>
+                                                                <Dropdown.Item href="#\">Area 3</Dropdown.Item>
+                                                                <Dropdown.Item href="#\">Area 4</Dropdown.Item>
+                                                                <Dropdown.Item href="#\">Area 5</Dropdown.Item>
+                                                                <Dropdown.Item href="#\">Area 6</Dropdown.Item>
+                                                                <Dropdown.Item href="#\">Area 7</Dropdown.Item>
+                                                                <Dropdown.Item href="#\">Area 8</Dropdown.Item>
+                                                                <Dropdown.Item href="#\">Area 9</Dropdown.Item>
+                                                                <Dropdown.Item href="#\">Area 10</Dropdown.Item>
+                                                            </DropdownButton>
+                                                        </div>
+
+                                                        <Table striped bordered hover>
+                                                        <thead>
+                                                            <tr>
+                                                            <th>Filename</th>
+                                                            <th>Upload Date</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                           {areaFiles}
+                                                        </tbody>
+                                                        </Table>
 
                                                         </div>
+                                                        
                                                     </div>
                                                 </Tab>
-                                                <Tab eventKey="logs" title="Action Logs">
+                                                <Tab eventKey="logs" title="Action Logs" className='px-3'>
                                                     <div className='row overflow-auto' style={{height: '80vh'}}>
                                                         <div className='col'>
-
+                                                        <div className='my-2'>
+                                                        <DropdownButton variant="dark" id="dropdown-basic-button" title="View By ">
+                                                            <Dropdown.Item href="#">This Day</Dropdown.Item>
+                                                            <Dropdown.Item href="#">This Week</Dropdown.Item>
+                                                            <Dropdown.Item href="#">This Month</Dropdown.Item>
+                                                        </DropdownButton>
+                                                        </div>
+                                                        <Table striped bordered hover>
+                                                        <thead>
+                                                            <tr>
+                                                            <th>User</th>
+                                                            <th>Action</th>
+                                                            <th>Date</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                           {actions}
+                                                        </tbody>
+                                                        </Table>
                                                         </div>
                                                     </div>
                                                 </Tab>
