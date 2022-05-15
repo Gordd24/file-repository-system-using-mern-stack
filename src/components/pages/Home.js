@@ -2,7 +2,7 @@ import Level from '../page-components/LevelCard'
 import Navigation from '../page-components/Navigation'
 import React,{useState,useEffect} from 'react';
 import jwt_decode from 'jwt-decode'
-import { Dropdown, DropdownButton } from 'react-bootstrap';
+import { Dropdown, DropdownButton, Modal, Button } from 'react-bootstrap';
 import bg4 from '../img/bg4.png'
 import bg5 from '../img/bg5.png'
 import bg6 from '../img/bg6.png'
@@ -13,6 +13,24 @@ function Home(){
     const accessToken = object.accessToken
     const decodeToken = jwt_decode(accessToken)
     const personName = decodeToken.fName + ' ' + decodeToken.lName
+
+
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+
+    const [showAlertSuccess, setShowAlertSuccess] = useState(false);
+
+    const alertCloseSuccess = () => setShowAlertSuccess(false);
+    const alertShowSuccess = () => setShowAlertSuccess(true);
+
+    const [showAlertFailed, setShowAlertFailed] = useState(false);
+
+    const alertCloseFailed = () => setShowAlertFailed(false);
+    const alertShowFailed = () => setShowAlertFailed(true);
+
+
     
     const[levelComps,setLevelComps] = useState([])
     const[levels,setLevels] = useState([])
@@ -49,10 +67,13 @@ function Home(){
         }).then(data => data.json())
         .then(data => {
             if(data.level === "Maximum"){
-                alert('Level creation has reached its maximum limit!')
+               handleClose()
+                alertShowFailed()
             }else{
+                
                 setLevels([...levels,data.level])
-                alert('Level '+(levels.length+1)+' was successfully created!')       
+                handleClose()
+                alertShowSuccess()  
             }  
         })
     }
@@ -60,6 +81,47 @@ function Home(){
 
     return(
         <div className="h-100">
+
+                    <Modal show={show} onHide={handleClose} centered>
+                            <Modal.Header closeButton>
+                            <Modal.Title>Create Level</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>By clicking the confirm button you are creating a new level, Do you want to continue?</Modal.Body>
+                            <Modal.Footer>
+                            <Button variant="secondary" onClick={handleClose}>
+                                No
+                            </Button>
+                            <Button variant="primary" onClick={createLevel}>
+                                Confirm
+                            </Button>
+                            </Modal.Footer>
+                    </Modal>
+
+                    <Modal show={showAlertSuccess} onHide={alertCloseSuccess} centered>
+                            <Modal.Header closeButton>
+                            <Modal.Title>Success!</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>You successfully created a new Level!</Modal.Body>
+                            <Modal.Footer>
+                            <Button variant="primary" onClick={alertCloseSuccess}>
+                                Got it!
+                            </Button>
+                            </Modal.Footer>
+                    </Modal>
+
+
+                    <Modal show={showAlertFailed} onHide={alertCloseFailed} centered>
+                            <Modal.Header closeButton>
+                            <Modal.Title>Creation Failed!</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>It seems like you've reached the maximum number of available levels.</Modal.Body>
+                            <Modal.Footer>
+                            <Button variant="secondary" onClick={alertCloseFailed}>
+                                Understood
+                            </Button>
+                            </Modal.Footer>
+                    </Modal>
+
                     <div className="row navbar-static-top">
                         <div className="col">
                             <Navigation />
@@ -81,7 +143,7 @@ function Home(){
                                         <a  className="btn text-decoration-underline text-dark" href='/home'><strong>Levels</strong></a>
                                     </div>
                                 </div>
-                                <div  onClick={createLevel} className='btn col-4 col-sm-4 col-md-3 d-xs-block d-sm-block d-md-block d-lg-none justify-content-left bg-dark text-light'>
+                                <div  onClick={handleShow} className='btn col-4 col-sm-4 col-md-3 d-xs-block d-sm-block d-md-block d-lg-none justify-content-left bg-dark text-light'>
                                     Create Level
                                 </div>
                             </div>
@@ -98,7 +160,7 @@ function Home(){
 
                                     <div className='row text-light justify-content-center p-2' style={{ height: '92.5%'}}>
                                         <div className='col-12'>
-                                            <button className='btn-dark form-control my-2' onClick={createLevel}>Create Level</button>
+                                            <button className='btn-dark form-control my-2' onClick={handleShow}>Create Level</button>
                                         </div>
                                     </div>
 

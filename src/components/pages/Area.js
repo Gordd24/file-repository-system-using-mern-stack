@@ -2,7 +2,7 @@ import Navigation from '../page-components/Navigation'
 import ParamCard from '../page-components/ParamCard';
 import React,{useState,useEffect} from 'react';
 import { useParams } from 'react-router-dom';
-import { Modal,Dropdown,DropdownButton } from 'react-bootstrap';
+import { Dropdown, DropdownButton, Modal, Button } from 'react-bootstrap';
 import bg4 from '../img/bg4.png'
 import bg6 from '../img/bg6.png'
 import jwt_decode from 'jwt-decode'
@@ -27,6 +27,12 @@ function Area(props){
         setShow(false)
     }
     const handleShow = () => setShow(true);
+
+
+    const [showAlertSuccess, setShowAlertSuccess] = useState(false);
+
+    const alertCloseSuccess = () => setShowAlertSuccess(false);
+    const alertShowSuccess = () => setShowAlertSuccess(true);
 
     useEffect(()=>{
 
@@ -75,10 +81,10 @@ function Area(props){
             })
         }).then(data => data.json())
         .then(data => {
-
-                console.log('create',data)
+                handleClose()
+                alertShowSuccess()
                 setParameters([...parameters,data.parameter])
-                console.log(data.parameter)
+            
            
             
         })
@@ -107,6 +113,19 @@ function Area(props){
                         </Modal.Body>
                     </Modal>
 
+
+
+                    <Modal show={showAlertSuccess} onHide={alertCloseSuccess} centered>
+                            <Modal.Header closeButton>
+                            <Modal.Title>Success!</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>You successfully created a new Phase!</Modal.Body>
+                            <Modal.Footer>
+                            <Button variant="primary" onClick={alertCloseSuccess}>
+                                Got it!
+                            </Button>
+                            </Modal.Footer>
+                    </Modal>
                     <div className="row navbar-static-top">
                         <div className="col">
                             <Navigation />

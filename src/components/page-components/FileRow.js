@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Axios from 'axios'
 import FileDownload from 'js-file-download'
-import { DropdownButton, Modal,Card,Dropdown } from 'react-bootstrap';
+import { DropdownButton, Modal,Card,Dropdown, Button } from 'react-bootstrap';
 import bg1 from '../img/bg1.png'
 import jwt_decode from 'jwt-decode'
 function FileRow(props){
@@ -18,6 +18,10 @@ function FileRow(props){
     const[renameFile,setRenameFile] = useState('')
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+
+    const[showDelConfirm,setDelConfirm] = useState('')
+    const handleDelCloseConfirm = () =>setDelConfirm(false);
+    const handleDelShowConfirm = () =>setDelConfirm(true);
 
     const handleCloseRename = () => 
     {
@@ -93,7 +97,7 @@ function FileRow(props){
         }).then(data=>data.json()).then(data=>
         {
            if(data.message==="ok"){
-               alert('File is Succesfully deleted')
+               handleDelCloseConfirm()
                window.location.href='/home/level/'+props.path
            } 
         })
@@ -146,7 +150,7 @@ function FileRow(props){
     return(
             <div className="col-12 col-sm-6 col-md-4 col-xl-3">
 
-<Modal show={show} onHide={handleClose} aria-labelledby="contained-modal-title-vcenter" centered>
+            <Modal show={show} onHide={handleClose} aria-labelledby="contained-modal-title-vcenter" centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Move File To</Modal.Title>
                 </Modal.Header>
@@ -184,29 +188,64 @@ function FileRow(props){
                 </form>
                 </Modal.Body>
             </Modal>
-                            <Card
-                            text={'dark'}
-                            className="mb-2 shadow"
-                            >
-                                <Card.Header bg={'secondary'} className="bg-dark text-light">{props.filename}</Card.Header>
-                                <Card.Body style={{ backgroundImage: `url(${bg1})`,  backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundPosition: 'center'}}>
-                                    <Card.Text className="m-4" style={{textShadow: '4px 4px 24px rgba(251,251,251,1)'}}>
-                                    </Card.Text>
-                                </Card.Body>
-                                <Card.Footer>
-                                    <div className='d-flex flex-row-reverse'>
-                                            <DropdownButton id="dropdown-basic-button" variant='dark' title='Action'>
-                                                <Dropdown.Item onClick={handleShowRename}>Rename</Dropdown.Item>
-                                                <Dropdown.Item onClick={del}>Delete</Dropdown.Item>
-                                                <Dropdown.Item onClick={handleShow}>Move</Dropdown.Item>
-                                                <Dropdown.Item onClick={downloadFile}>Download</Dropdown.Item>
-                                            </DropdownButton>
-                                    </div>
-                                     
-                                </Card.Footer>
-                            </Card>
 
-            </div>
+            <Modal show={showDelConfirm} onHide={handleDelCloseConfirm} aria-labelledby="contained-modal-title-vcenter" centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>File Deletion</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Are you sure you really want to delete this file?
+                </Modal.Body>
+                <Modal.Footer>
+                            <Button variant="secondary" onClick={handleDelCloseConfirm}>
+                                No
+                            </Button>
+                            <Button variant="primary" onClick={del}>
+                                Confirm
+                            </Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal show={showDelConfirm} onHide={handleDelCloseConfirm} aria-labelledby="contained-modal-title-vcenter" centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>File Deletion</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Are you sure you really want to delete this file?
+                </Modal.Body>
+                <Modal.Footer>
+                            <Button variant="secondary" onClick={handleDelCloseConfirm}>
+                                No
+                            </Button>
+                            <Button variant="primary" onClick={del}>
+                                Confirm
+                            </Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Card
+            text={'dark'}
+            className="mb-2 shadow"
+            >
+                <Card.Header bg={'secondary'} className="bg-dark text-light">{props.filename}</Card.Header>
+                <Card.Body style={{ backgroundImage: `url(${bg1})`,  backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundPosition: 'center'}}>
+                    <Card.Text className="m-4" style={{textShadow: '4px 4px 24px rgba(251,251,251,1)'}}>
+                    </Card.Text>
+                </Card.Body>
+                <Card.Footer>
+                    <div className='d-flex flex-row-reverse'>
+                            <DropdownButton id="dropdown-basic-button" variant='dark' title='Action'>
+                                <Dropdown.Item onClick={handleShowRename}>Rename</Dropdown.Item>
+                                <Dropdown.Item onClick={handleDelShowConfirm}>Delete</Dropdown.Item>
+                                <Dropdown.Item onClick={handleShow}>Move</Dropdown.Item>
+                                <Dropdown.Item onClick={downloadFile}>Download</Dropdown.Item>
+                            </DropdownButton>
+                    </div>
+                        
+                </Card.Footer>
+            </Card>
+
+        </div>
     )
 }
 

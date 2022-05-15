@@ -2,7 +2,7 @@ import PhaseCard from '../page-components/PhaseCard';
 import React,{useState,useEffect} from 'react';
 import { useParams } from 'react-router-dom';
 import Navigation from '../page-components/Navigation'
-import { Dropdown, DropdownButton } from 'react-bootstrap';
+import { Dropdown, DropdownButton, Modal, Button } from 'react-bootstrap';
 import bg4 from '../img/bg4.png'
 import jwt_decode from 'jwt-decode'
 import bg6 from '../img/bg6.png'
@@ -14,6 +14,16 @@ function Level(props){
     const accessToken = object.accessToken
     const decodeToken = jwt_decode(accessToken)
     const personName = decodeToken.fName + ' ' + decodeToken.lName
+
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+
+    const [showAlertSuccess, setShowAlertSuccess] = useState(false);
+
+    const alertCloseSuccess = () => setShowAlertSuccess(false);
+    const alertShowSuccess = () => setShowAlertSuccess(true);
 
     const params = useParams()
 
@@ -73,12 +83,41 @@ function Level(props){
             })
         }).then(data => data.json())
         .then(data => {
+            handleClose()
             setPhases([...phases,data.phase])
+            alertShowSuccess()
         })
     }
 
     return(
         <div className="h-100">
+                    <Modal show={show} onHide={handleClose} centered>
+                            <Modal.Header closeButton>
+                            <Modal.Title>Create Phase</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>By clicking the confirm button you are creating a new Phase, Do you want to continue?</Modal.Body>
+                            <Modal.Footer>
+                            <Button variant="secondary" onClick={handleClose}>
+                                No
+                            </Button>
+                            <Button variant="primary" onClick={createPhase}>
+                                Confirm
+                            </Button>
+                            </Modal.Footer>
+                    </Modal>
+
+
+                    <Modal show={showAlertSuccess} onHide={alertCloseSuccess} centered>
+                            <Modal.Header closeButton>
+                            <Modal.Title>Success!</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>You successfully created a new Phase!</Modal.Body>
+                            <Modal.Footer>
+                            <Button variant="primary" onClick={alertCloseSuccess}>
+                                Got it!
+                            </Button>
+                            </Modal.Footer>
+                    </Modal>
                     <div className="row navbar-static-top">
                         <div className="col">
                             <Navigation/>
@@ -103,7 +142,7 @@ function Level(props){
                                     </div>
                                 </div>
 
-                                <div  onClick={createPhase} className='btn col-4 col-sm-4 col-md-3 d-xs-block d-sm-block d-md-block d-lg-none justify-content-left bg-dark text-light'>
+                                <div  onClick={handleShow} className='btn col-4 col-sm-4 col-md-3 d-xs-block d-sm-block d-md-block d-lg-none justify-content-left bg-dark text-light'>
                                     Create Phase
                                 </div>
                             </div>
@@ -120,7 +159,7 @@ function Level(props){
 
                                     <div className='row text-light justify-content-center p-2' style={{ height: '92.5%'}}>
                                         <div className='col-12'>
-                                            <button className='btn-dark form-control my-2' onClick={createPhase}>Create Phase</button>
+                                            <button className='btn-dark form-control my-2' onClick={handleShow}>Create Phase</button>
                                         </div>
                                     </div>
 

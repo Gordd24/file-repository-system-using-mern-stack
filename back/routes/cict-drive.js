@@ -514,7 +514,7 @@ router.post("/sign_up", async (request, response) =>{
 
             let paramObj = {}
             let areaId = 'level.'+(request.body.phase-1)+'.'+(request.body.area-1);
-            paramObj[areaId]='P-'+request.body.paramName
+            paramObj[areaId]=request.body.paramName
 
             let doc = await LevelModel.findOneAndUpdate(
             { _id: levelId}, 

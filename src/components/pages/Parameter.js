@@ -2,7 +2,7 @@ import Navigation from '../page-components/Navigation'
 import FileRow from '../page-components/FileRow';
 import React,{useState,useEffect} from 'react';
 import { useParams } from 'react-router-dom';
-import { Modal,Dropdown,DropdownButton } from 'react-bootstrap';
+import { Modal,Dropdown,DropdownButton,Button } from 'react-bootstrap';
 import bg4 from '../img/bg4.png'
 import bg6 from '../img/bg6.png'
 import jwt_decode from 'jwt-decode'
@@ -23,6 +23,16 @@ function Parameter(props){
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     const [show, setShow] = useState(false);
+
+    const [showAlertSuccess, setShowAlertSuccess] = useState(false);
+
+    const alertCloseSuccess = () => 
+    {
+        setShowAlertSuccess(false);
+        window.location.href= '/home/level/'+params.id+'/'+params.phaseId+'/'+params.areaId+'/'+params.paramId
+    }
+    const alertShowSuccess = () => setShowAlertSuccess(true);
+
 
     useEffect(
         ()=>{
@@ -82,9 +92,9 @@ function Parameter(props){
              body:data,
              personName
         }).then(data => data.json()).then(data => {
-            window.location.href= '/home/level/'+params.id+'/'+params.phaseId+'/'+params.areaId+'/'+params.paramId
-
-            //for proper rerender
+            handleClose()
+            alertShowSuccess()
+            
             // let newFiles=[]
             // for(let i = 0; i < data.length; i++){
             //     console.log('data'+i,data[i])
@@ -106,6 +116,17 @@ function Parameter(props){
 
     return(
         <div className="h-100">
+                <Modal show={showAlertSuccess} onHide={alertCloseSuccess} centered>
+                    <Modal.Header closeButton>
+                    <Modal.Title>Success!</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>Your upload is done!</Modal.Body>
+                    <Modal.Footer>
+                    <Button variant="primary" onClick={alertCloseSuccess}>
+                        Got it!
+                    </Button>
+                    </Modal.Footer>
+                </Modal>
                  <Modal show={show} onHide={handleClose} aria-labelledby="contained-modal-title-vcenter" centered>
                     <Modal.Header closeButton>
                         <Modal.Title>Upload File</Modal.Title>
