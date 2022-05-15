@@ -33,26 +33,19 @@ function Home(){
 
     
     const[levelComps,setLevelComps] = useState([])
-    const[levels,setLevels] = useState([])
+
+
     useEffect(
         ()=>{
+            fetch('http://localhost:1337/cictdrive/load-levels').then(data => data.json())
+            .then(data => {
 
-            if(levels.length!==0){
-                let levelHolder = [];
-                for(let i=levelHolder.length+1;i<levels.length+1;i++){
-                     levelHolder.push(<Level desc={'All files relevant to level '+(i)+' were placed in this directory.'} level={i} levelId={levels[i-1]} key={levels[i-1]}/>);
-                }
-                setLevelComps(levelHolder);
-            }else{
-                fetch('http://localhost:1337/cictdrive/load-levels').then(data => data.json())
-                .then(data => {
-                    if(data.level.length!==0){
-                    setLevels(data.level)
-                    }
-                })
-            }
+                const levelsHolder = data.data.map((level,index)=><Level desc={'All files relevant to level '+(index+1)+' were placed in this directory.'} level={index+1} levelId={level._id} key={level._id}/>)
+                setLevelComps(levelsHolder)
+            })
         }
-    ,[levels])
+    ,[])
+
 
     function createLevel() {
         fetch('http://localhost:1337/cictdrive/create-level',{
@@ -61,17 +54,17 @@ function Home(){
                 'Content-Type':'application/json'
             },
             body: JSON.stringify({
-                'level':levels.length+1,
+                'level':levelComps.length+1,
                 personName
             })
-        }).then(data => data.json())
+        })
+        .then(data => data.json())
         .then(data => {
             if(data.level === "Maximum"){
                handleClose()
                 alertShowFailed()
             }else{
-                
-                setLevels([...levels,data.level])
+                setLevelComps([...levelComps,<Level desc={'All files relevant to level '+(data.doc.value)+' were placed in this directory.'} level={data.doc.value} levelId={data.doc._id} key={data.doc._id}/>])
                 handleClose()
                 alertShowSuccess()  
             }  

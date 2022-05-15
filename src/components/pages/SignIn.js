@@ -18,7 +18,6 @@ function SignIn(){
         try {
             const response = await axios.post('http://localhost:1337/cictdrive/refresh')
             setUser({
-                //spread syntax daw ung ... di ko masyado gets pero iniispread nya daw ung laman ng arrays??
                 ...user,
                 accessToken : response.data.accessToken,
                 refreshToken : response.data.refreshToken,

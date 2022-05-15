@@ -29,26 +29,9 @@ function Level(props){
 
     const[phaseComps,setPhaseComps] = useState([])
     const[phases,setPhases] = useState([])
-    useEffect(()=>{
-        console.log('eyo');
-        console.log(params.id)
-        console.log(phases)
-        setPhases([]);
-
-    },[])
-
 
     useEffect(
         ()=>{
-            // console.log('phases:',phases);
-            // console.log('phases length:',phases.length);
-            if(phases.length!==0){
-                let phaseHolder = [];
-                for(let i=phaseHolder.length+1;i<phases.length+1;i++){
-                     phaseHolder.push(<PhaseCard desc={'Phase '+(i)} level={params.id} phase={i} key={phases[i-1]}/>);
-                }
-                setPhaseComps(phaseHolder);
-            }else{
                 fetch('http://localhost:1337/cictdrive/load-phases',{
                     method:'POST',
                     headers:{
@@ -57,17 +40,47 @@ function Level(props){
                     body: JSON.stringify({
                         'level':params.id,
                     })
-                }).then(data => data.json())
+                })
+                .then(data => data.json())
                 .then(data => {
-                    if(data.phases.length!==0){
-                        console.log(data.phases)
-                        console.log('got in');
-                        setPhases(data.phases)
-                    }
+                    console.log(data.phases)
+                    const phaseHolder = data.phases.map((phase)=><PhaseCard desc={'Phase '+(phase)} level={params.id} phase={phase} key={phase}/>)
+                    setPhaseComps(phaseHolder);
                 })
             }
-        }
-    ,[phases])
+        
+    ,[])
+
+
+
+    // useEffect(
+    //     ()=>{
+    //         if(phases.length!==0){
+    //             let phaseHolder = [];
+    //             for(let i=phaseHolder.length+1;i<phases.length+1;i++){
+    //                  phaseHolder.push(<PhaseCard desc={'Phase '+(i)} level={params.id} phase={i} key={phases[i-1]}/>);
+    //             }
+    //             setPhaseComps(phaseHolder);
+    //         }else{
+    //             fetch('http://localhost:1337/cictdrive/load-phases',{
+    //                 method:'POST',
+    //                 headers:{
+    //                     'Content-Type':'application/json'
+    //                 },
+    //                 body: JSON.stringify({
+    //                     'level':params.id,
+    //                 })
+    //             }).then(data => data.json())
+    //             .then(data => {
+    //                 if(data.phases.length!==0){
+    //                     console.log(data.phases)
+    //                     console.log('got in');
+    //                     setPhases(data.phases)
+    //                 }
+    //             })
+    //         }
+    //     }
+    // ,[phases])
 
     function createPhase() {
 

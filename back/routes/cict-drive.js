@@ -342,10 +342,6 @@ router.post("/sign_up", async (request, response) =>{
 
       LevelModel.find({}).then(data => 
         {
-          let levelValue = 1
-          for (let i = 0; i<data.length; i++){
-              levelValue = data.length + 1
-          }
           if(data.length<4){
             var dir = './files/'+request.body.level;
 
@@ -359,13 +355,13 @@ router.post("/sign_up", async (request, response) =>{
                   logsModel.save();
 
                     LevelModel.create({
-                    level: [],
-                    value:  levelValue
-                  },(err,doc)=>{
-                    if(!err){
-                      response.json({level: doc.id})
-                    }
-                  })
+                      level: [],
+                      value:  data.length+1
+                      },(err,doc)=>{
+                        if(!err){
+                          response.json({doc})
+                        }
+                    })
 
                 }catch(err){
                   console.log(err)
@@ -379,26 +375,19 @@ router.post("/sign_up", async (request, response) =>{
           }
         }
       );
-      // await LevelModel.findOneAndUpdate(
-      //   { _id: '626072d5d97cb44ff44620d3'}, 
-      //   { $push: {'level':[]}}
-      // );
       
   });
 
-  router.get('/load-levels', async (request, response) => {
+  router.get('/load-levels', (request, response) => {
 
-      let newArr = []
-      LevelModel.find({}).then(data => 
-        {
-          for(let i = 0; i < data.length; i++){
-            newArr.push(data[i].id)
+        let newArr = []
+        LevelModel.find({}).then(data => 
+          {
+            response.json({data})
           }
-          response.json({level: newArr})
-        }
-      );
-    
-  });
+        );
+      
+    });
 
   router.get('/levels', async (request, response)=>{
     await LevelModel.find({})
@@ -465,24 +454,15 @@ router.post("/sign_up", async (request, response) =>{
 
   })
 
-  router.post('/load-phases', async (request, response) => {
+  router.post('/load-phases', (request, response) => {
 
-    LevelModel.find({}).then(data => {
-      let newArr = []
-      for(let i = 0; i < data.length; i++){
-        newArr.push(data[i].id)
-      }
-      let levelId = newArr[request.body.level-1];
-      LevelModel.findOne({_id:levelId},function (err, doc){
-
-            let newArr = []
-            for(let i = 0; i < doc.level.length; i++){
-              newArr.push(i)
+    LevelModel.findOne({value:request.body.level}).then(data => {
+            console.log(data)
+            let phases = []
+            for(let i = 0; i < data.level.length; i++){
+              phases.push(i+1)
             }
-            response.json({phases: newArr})    
-
-      })
-    
+            response.json({phases})    
     }) 
 
    
