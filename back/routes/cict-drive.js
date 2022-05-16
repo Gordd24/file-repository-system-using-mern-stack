@@ -428,6 +428,7 @@ router.post("/sign_up", async (request, response) =>{
   router.post('/create-phase', async (request, response) => {
 
             var dir = './files/'+request.body.level+'/'+request.body.phase;
+            console.log(dir)
 
             if (!fs.existsSync(dir)){
                 fs.mkdirSync(dir);
@@ -437,36 +438,28 @@ router.post("/sign_up", async (request, response) =>{
                     action: 'created a new phase'
                   })
                   await logsModel.save();
-                  LevelModel.find({}).then(async data => {
-                    let newArr = []
-                    for(let i = 0; i < data.length; i++){
-                      newArr.push(data[i].id)
+                    let doc = await LevelModel.findOneAndUpdate(
+                    { value: request.body.level}, 
+                    { $push: {'level':[]}},
+                    {new:true});
+
+                    response.json({'phase':doc.level.length})
+                    
+                    let areaObj = {}
+                    let phaseId = 'level.'+(doc.level.length-1);
+                    areaObj[phaseId]=[]
+
+                    for(i=0;i<10;i++){
+
+                        var dir = './files/'+request.body.level+'/'+request.body.phase+'/'+(i+1);
+                        if (!fs.existsSync(dir)){
+                            fs.mkdirSync(dir);
+                            await LevelModel.findOneAndUpdate(
+                            { value: request.body.level}, 
+                            { $push: areaObj},
+                            {new:true},);
+                        }
                     }
-                      let levelId = newArr[request.body.level-1]
-                      let doc = await LevelModel.findOneAndUpdate(
-                        { _id: levelId}, 
-                        { $push: {'level':[]}},
-                        {new:true});
-
-                      response.json({'phase':doc.level.length-1})
-
-                      
-                      let areaObj = {}
-                      let phaseId = 'level.'+(doc.level.length-1);
-                      areaObj[phaseId]=[]
-
-                      for(i=0;i<10;i++){
-
-                          var dir = './files/'+request.body.level+'/'+request.body.phase+'/'+(i+1);
-                          if (!fs.existsSync(dir)){
-                              fs.mkdirSync(dir);
-                              await LevelModel.findOneAndUpdate(
-                              { _id: levelId}, 
-                              { $push: areaObj},
-                              {new:true},);
-                          }
-                      }
-                  })
                   
                  
                 }catch(err){

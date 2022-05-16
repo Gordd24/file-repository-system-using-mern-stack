@@ -15,12 +15,11 @@ function Phase(props){
 
     useEffect(
         ()=>{
-                let areaHolder = [];
+            let areaHolder = [];
                 for(let i=1;i<11;i++){
                      areaHolder.push(<AreaCard desc={description[i-1]} level={params.id} phase={params.phaseId} area={i} key={i}/>);
                 }
-                setAreaComps(areaHolder);
-
+            setAreaComps(areaHolder);
         }
     ,[])
 

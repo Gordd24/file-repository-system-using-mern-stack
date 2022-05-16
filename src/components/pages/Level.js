@@ -28,7 +28,6 @@ function Level(props){
     const params = useParams()
 
     const[phaseComps,setPhaseComps] = useState([])
-    const[phases,setPhases] = useState([])
 
     useEffect(
         ()=>{
@@ -52,38 +51,8 @@ function Level(props){
     ,[])
 
 
-
-    // useEffect(
-    //     ()=>{
-    //         if(phases.length!==0){
-    //             let phaseHolder = [];
-    //             for(let i=phaseHolder.length+1;i<phases.length+1;i++){
-    //                  phaseHolder.push(<PhaseCard desc={'Phase '+(i)} level={params.id} phase={i} key={phases[i-1]}/>);
-    //             }
-    //             setPhaseComps(phaseHolder);
-    //         }else{
-    //             fetch('http://localhost:1337/cictdrive/load-phases',{
-    //                 method:'POST',
-    //                 headers:{
-    //                     'Content-Type':'application/json'
-    //                 },
-    //                 body: JSON.stringify({
-    //                     'level':params.id,
-    //                 })
-    //             }).then(data => data.json())
-    //             .then(data => {
-    //                 if(data.phases.length!==0){
-    //                     console.log(data.phases)
-    //                     console.log('got in');
-    //                     setPhases(data.phases)
-    //                 }
-    //             })
-    //         }
-    //     }
-    // ,[phases])
-
     function createPhase() {
-
+        console.log('hehe')
         fetch('http://localhost:1337/cictdrive/create-phase',{
             method: 'POST',
             headers: {
@@ -91,13 +60,13 @@ function Level(props){
             },
             body: JSON.stringify({
                 'level':params.id,
-                'phase':phases.length+1,
+                'phase':phaseComps.length+1,
                 personName
             })
         }).then(data => data.json())
         .then(data => {
             handleClose()
-            setPhases([...phases,data.phase])
+            setPhaseComps([...phaseComps,<PhaseCard desc={'Phase '+(data.phase)} level={params.id} phase={data.phase} key={data.phase}/>])
             alertShowSuccess()
         })
     }
