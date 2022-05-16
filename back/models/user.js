@@ -31,18 +31,20 @@ const UserSchema = new mongoose.Schema({
     },
     level:{
         type: String, 
-        required: true },
+         },
     phase:{
         type: String, 
-        required: true },
+         },
     area:{
         type: String, 
-        required: true
+        
     },
     type:{
         type: String, 
         required: true,
     }
+},{
+    timestamps:true
 })
 
 // Use the schema to create a Model!

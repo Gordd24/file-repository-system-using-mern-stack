@@ -8,14 +8,36 @@ import LogFileRow from '../page-components/LogFileRow';
 import ActionRow from '../page-components/ActionRow';
 
 function Logs(){
+
+    const logsUrl = 'http://localhost:1337/cictdrive/logs'
+    const uploadedUrl = 'http://localhost:1337/cictdrive/file-uploads'
+    
     const[upFiles,setUpFiles] = useState([])
     const[areaFiles,setAreaFiles] = useState([])
+    const[areaVal,setAreaVal] = useState('')
+    const handleAreaSelect = (e) =>{
+        console.log(e)
+        setAreaVal(e)
+    }
+
+    
+
     const[actions,setActions] = useState([])
     useEffect(()=>{
-        setUpFiles([<LogFileRow filename='text.txt' upload='12/12/12' key={1} />])
-        setAreaFiles([<LogFileRow filename='textFinal.txt' upload='12/12/12' key={1} />])
-        setActions([<ActionRow user="jasper" action="creates" date="10/10/10"/>])
-    },[])
+        
+        axios.post(logsUrl).then(response =>{
+            setActions(response.data)
+           
+        })
+        axios.post(uploadedUrl).then(response =>{
+            setUpFiles(response.data)
+            setAreaFiles(response.data)
+        })
+        
+        // setUpFiles([<LogFileRow filename='text.txt' upload='12/12/12' key={1} />])
+        // setAreaFiles([<LogFileRow filename='textFinal.txt' upload='12/12/12' key={1} />])
+        // setActions([<ActionRow user="jasper" action="creates" date="10/10/10"/>])
+    },[logsUrl])
 
     return(
         <div className="h-100">
@@ -69,7 +91,10 @@ function Logs(){
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                           {upFiles}
+                                                        {upFiles.map((getUpFiles)=>(
+                                                                getUpFiles.filename &&
+                                                               <LogFileRow filename={getUpFiles.filename} upload={getUpFiles.date} key={getUpFiles.filename}  />
+                                                           ))}
                                                         </tbody>
                                                         </Table>
 
@@ -80,17 +105,17 @@ function Logs(){
                                                     <div className='row overflow-auto' style={{height: '80vh'}}>
                                                         <div className='col'>
                                                         <div className='my-2'>
-                                                            <DropdownButton id="dropdown-basic-button" variant="dark" title="Select Area">
-                                                                <Dropdown.Item href="#\">Area 1</Dropdown.Item>
-                                                                <Dropdown.Item href="#\">Area 2</Dropdown.Item>
-                                                                <Dropdown.Item href="#\">Area 3</Dropdown.Item>
-                                                                <Dropdown.Item href="#\">Area 4</Dropdown.Item>
-                                                                <Dropdown.Item href="#\">Area 5</Dropdown.Item>
-                                                                <Dropdown.Item href="#\">Area 6</Dropdown.Item>
-                                                                <Dropdown.Item href="#\">Area 7</Dropdown.Item>
-                                                                <Dropdown.Item href="#\">Area 8</Dropdown.Item>
-                                                                <Dropdown.Item href="#\">Area 9</Dropdown.Item>
-                                                                <Dropdown.Item href="#\">Area 10</Dropdown.Item>
+                                                            <DropdownButton id="dropdown-basic-button" variant="dark" title="Select Area" onSelect={handleAreaSelect}>
+                                                                <Dropdown.Item eventKey="1">Area 1</Dropdown.Item>
+                                                                <Dropdown.Item eventKey="2">Area 2</Dropdown.Item>
+                                                                <Dropdown.Item eventKey="3">Area 3</Dropdown.Item>
+                                                                <Dropdown.Item eventKey="4">Area 4</Dropdown.Item>
+                                                                <Dropdown.Item eventKey="5">Area 5</Dropdown.Item>
+                                                                <Dropdown.Item eventKey="6">Area 6</Dropdown.Item>
+                                                                <Dropdown.Item eventKey="7">Area 7</Dropdown.Item>
+                                                                <Dropdown.Item eventKey="8">Area 8</Dropdown.Item>
+                                                                <Dropdown.Item eventKey="9">Area 9</Dropdown.Item>
+                                                                <Dropdown.Item eventKey="10">Area 10</Dropdown.Item>
                                                             </DropdownButton>
                                                         </div>
 
@@ -102,7 +127,10 @@ function Logs(){
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                           {areaFiles}
+                                                           {areaFiles.map((getAreaFiles)=>(
+                                                                getAreaFiles.filename && getAreaFiles.areaDir === areaVal &&
+                                                               <LogFileRow filename={getAreaFiles.filename} upload={getAreaFiles.date} key={getAreaFiles.filename}/>
+                                                           ))}
                                                         </tbody>
                                                         </Table>
 
@@ -129,7 +157,9 @@ function Logs(){
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                           {actions}
+                                                           {actions.map((getActions)=>(
+                                                               <ActionRow user={getActions.user} action={getActions.action} date={getActions.date}/>
+                                                           ))}
                                                         </tbody>
                                                         </Table>
                                                         </div>

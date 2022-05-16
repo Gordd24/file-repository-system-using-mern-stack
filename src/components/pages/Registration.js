@@ -44,13 +44,12 @@ function Registration(){
             axios.get(levelUrl)
             .then(response => {
             setLevels(response.data)
-            console.log(response.data)
+            // console.log(response.data)
         })
         },[levelUrl])
     
 
         if(levels.length !== 0){
-            
             if(level!==''){
                 
                 for (let i = 0; i <level;i++){      
@@ -108,21 +107,24 @@ function Registration(){
             if(!password)errors.password="Password is required"
             if(!confirmPassword)errors.confirmPassword="Confirm Password is required" 
         }
-        
-        if (!level){
-            errors.level="Level is required"
-        }
-
-        if (!phase){
-            errors.phase="Phase is required"
-        }
-
-        if (!area){
-            errors.area="Area is required"
-        }
         if (!type){
             errors.type="Account type is required"
         }
+
+        if(type==='faculty'){
+            if (!level){
+                errors.level="Level is required"
+            }
+    
+            if (!phase){
+                errors.phase="Phase is required"
+            }
+    
+            if (!area){
+                errors.area="Area is required"
+            }
+        }
+        
         return errors
     }
 
@@ -131,7 +133,7 @@ function Registration(){
     function register(event){
         event.preventDefault();
         setFormErrors(validate(fName,lName,email,username,password,confirmPassword,level,phase,area,type))
-        console.log(formErrors)
+        //console.log(formErrors)
         if(Object.keys(formErrors).length === 0){
             //  console.log(fName,mName,lName,email,username,password,confirmPassword,level,phase,area,type)
              fetch('http://localhost:1337/cictdrive/sign_up',{
@@ -146,26 +148,33 @@ function Registration(){
              }).then(res => res.json())
              .then(data => 
                  {
-                     console.log(data)
-                     if(data.status==="ok"){
+                     console.log(data.message)
+                     if(data.message==='success'){
                          alert('Succesfully Created!')
                          window.location.href = '/registration';
                      }else{
                          let existError = data.message;
-                         if(existError !== undefined){
-                             if(existError.includes('_') ){
-                                let errorSplit = existError.split('_')
+                         console.log(existError)
+                         if(existError === 'This username already exists'){
+                            setUnameExist(existError)
+                            
+                         }
+                         else if(existError === 'This email already exists'){
+                            setEmExist(existError)
+                            
+                         }else{
+                            
+                            let errorSplit = existError.split('_')
                             let usernameExist = errorSplit[0]
                             let emailExist = errorSplit[1]
                             setUnameExist(usernameExist)
                             setEmExist(emailExist)
-                             }
                             
                          }
-                         
-                     }
-                 }
-                 )
+                            
+                         }
+
+                     })
  
          }
         

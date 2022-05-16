@@ -13,13 +13,15 @@ function Parameter(props){
     const accessToken = object.accessToken
     const decodeToken = jwt_decode(accessToken)
     const personName = decodeToken.fName + ' ' + decodeToken.lName
-
     const params = useParams()
-
+    const currentAreaURL = params.id+'/'+params.phaseId+'/'+params.areaId
+    const userAreaURL = decodeToken.level+'/'+ decodeToken.phase+'/'+ decodeToken.area
+    // console.log('currentAreaUrl :'+  currentAreaURL)
+    // console.log('userAreaURL : '+ userAreaURL)
     const [file, setFile] = useState('');
     //for displaying list of files
     const [files,setFiles] = useState([]);
-
+    
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     const [show, setShow] = useState(false);
@@ -32,7 +34,6 @@ function Parameter(props){
         window.location.href= '/home/level/'+params.id+'/'+params.phaseId+'/'+params.areaId+'/'+params.paramId
     }
     const alertShowSuccess = () => setShowAlertSuccess(true);
-
 
     useEffect(
         ()=>{
@@ -73,7 +74,10 @@ function Parameter(props){
         event.preventDefault();
         console.log(file);
         const obj = {
-          dir: params.id+'/'+params.phaseId+'/'+params.areaId+'/'+params.paramId
+          dir: params.id+'/'+params.phaseId+'/'+params.areaId+'/'+params.paramId,
+          areaDir:params.areaId,
+          personName
+
         };
 
         const json = JSON.stringify(obj);
@@ -89,12 +93,11 @@ function Parameter(props){
         data.append('document',blob);
         fetch("http://localhost:1337/cictdrive/upload-file", {
              method: 'POST',
-             body:data,
-             personName
+             body:data
         }).then(data => data.json()).then(data => {
-            handleClose()
-            alertShowSuccess()
-            
+            window.location.href= '/home/level/'+params.id+'/'+params.phaseId+'/'+params.areaId+'/'+params.paramId
+
+            //for proper rerender
             // let newFiles=[]
             // for(let i = 0; i < data.length; i++){
             //     console.log('data'+i,data[i])
@@ -116,7 +119,7 @@ function Parameter(props){
 
     return(
         <div className="h-100">
-                <Modal show={showAlertSuccess} onHide={alertCloseSuccess} centered>
+                  <Modal show={showAlertSuccess} onHide={alertCloseSuccess} centered>
                     <Modal.Header closeButton>
                     <Modal.Title>Success!</Modal.Title>
                     </Modal.Header>
@@ -126,7 +129,7 @@ function Parameter(props){
                         Got it!
                     </Button>
                     </Modal.Footer>
-                </Modal>
+                </Modal>  
                  <Modal show={show} onHide={handleClose} aria-labelledby="contained-modal-title-vcenter" centered>
                     <Modal.Header closeButton>
                         <Modal.Title>Upload File</Modal.Title>
@@ -197,7 +200,11 @@ function Parameter(props){
 
                                     <div className='row text-light justify-content-center p-2' style={{ height: '92.5%'}}>
                                         <div className='col-12'>
-                                            <button className='btn-dark form-control my-2' onClick={handleShow}>Upload File</button>
+                                            {
+                                                userAreaURL === currentAreaURL &&
+                                                <button className='btn-dark form-control my-2' onClick={handleShow}>Upload File</button>
+
+                                            }
                                             
                                             
                                         </div>

@@ -16,6 +16,11 @@ const FileSchema = new mongoose.Schema({
         type: String, 
         required: true
     },
+    areaDir : String,
+    date : {
+        type: Date,
+        default:Date.now()
+        }
 })
 
 // Use the schema to create a Model!

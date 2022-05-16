@@ -7,7 +7,8 @@ const jwt = require('jsonwebtoken')
 const fs = require('fs');
 //middleware for uploading files, files will be accesible by req.files.filename
 const fileupload = require("express-fileupload");
-
+// const validator = require('../validation/validation')
+// const {validate} = require('express-validation')
 //for files
 router.use(fileupload());
 router.use(express.static("files"));
@@ -46,15 +47,77 @@ const verify = (request, response, next) => {
     response.status(401).json('Not authenticated')
   }
 }
-//registration
+
+const generateAccessToken = (user)=>{
+  return jwt.sign({
+      id: user._id,
+      fName: user.fName,
+      mName: user.mName,
+      lName: user.lName,
+      username: user.username,
+      level: user.level,
+      phase: user.phase,
+      area: user.area,
+      type: user.type
+      
+    },"sampleSecretKey",{
+      expiresIn:"15m"
+    })
+}
+
+const generateRefreshToken = (user) => {
+  return jwt.sign({
+      id: user._id,
+      fName: user.fName,
+      mName: user.mName,
+      lName: user.lName,
+      username: user.username,
+      level: user.level,
+      phase: user.phase,
+      area: user.area,
+      type: user.type
+    },"sampleRefreshSecretKey")
+}
+
+//registration v2 inaayos pa
+/* router.post("/sign_up_test",validate(validator.regValidator) ,async(request, response)=>{
+  try {
+    const userExist = await UserModel.findOne({
+      username: request.body.username
+    })
+    const emailExist = await UserModel.findOne({
+      email: request.body.email
+    })
+      if(userExist){
+        response.status(409).json({message: 'This username already exists'})
+      }
+      if(emailExist){
+        response.status(409).json({message: 'This email already exists'})
+      }
+      const newPassword = await  bcrypt.hash(request.body.password,10)
+  } catch (error) {
+    console.log(error)
+  }
+}) */
+
 router.post("/sign_up", async (request, response) =>{
-  const userExist = await UserModel.findOne({
-    username: request.body.username
-  })
-  const emailExist = await UserModel.findOne({
-    email: request.body.email
-  })
     try{
+
+      const userExist = await UserModel.findOne({
+        username: request.body.username
+      })
+      const emailExist = await UserModel.findOne({
+        email: request.body.email
+      })
+      
+        if(userExist && emailExist){
+          response.status(409).json({message: 'This username already exists_This email already exists'})
+        }
+        else if(userExist && !emailExist){
+          response.status(409).json({message: 'This username already exists'})
+        }else if(!userExist && emailExist){
+          response.status(409).json({message: 'This email already exists'})
+        }
 
       const newPassword = await  bcrypt.hash(request.body.password,10)
       await UserModel.create({
@@ -72,32 +135,19 @@ router.post("/sign_up", async (request, response) =>{
       })
       //saving logs
       const logsModel = new LogsModel({
-        data: request.body.personName + ' ' +'registered a new user',
+        user: request.body.personName,
+        action: "Registered a new user"
         
       })
       await logsModel.save();
 
-      response.json({status: 'ok'})
+      response.status(200).json({message: 'success'})
       
     }catch(err){
-      if(userExist|| emailExist){
-          let userMsg =""
-          let emailMsg =""
-          if(userExist){
-             userMsg ="Username already exists."    
-          }
-          if(emailExist){
-            emailMsg = "Email already exists."
-          }
-          response.status(409).json({message: userMsg + "_" + emailMsg})
-        }
-        else{
-          response.json({status: err, error:'something wrong'})
-        }
       console.log(err) 
     }
   })
-
+  //nagkaron ng error dito habol ko nlng later
   router.post("/update_name", async (request, response) =>{
     const data = request.body
     let errors = []
@@ -105,7 +155,7 @@ router.post("/sign_up", async (request, response) =>{
       _id: data.id,
     })
     
-    
+
      if(data.fName.length === 0|| data.lName.length === 0){
         if(data.fName.length===0)errors.push('First name is required')
         if(data.lName.length===0)errors.push('Last name is required')
@@ -137,8 +187,8 @@ router.post("/sign_up", async (request, response) =>{
         type: user.type
       },"sampleRefreshSecretKey")
       const logsModel = await new LogsModel({
-        data: user.fName + ' ' + user.lName + ' ' +'has updated their name to'+ ' ' + 
-        data.fName + ' ' + data.mName+ ' ' + data.lName, 
+        user: user.fName + ' ' + user.lName,
+        action: 'has updated their name to'+ ' ' + data.fName + ' ' + data.mName+ ' ' + data.lName, 
       })
       logsModel.save()
 
@@ -165,7 +215,6 @@ router.post("/sign_up", async (request, response) =>{
   })
   router.post("/update_password", async (request, response) =>{
       const data = request.body
-      const id = data.id
       let errors = []
       const user = await UserModel.findOne({
         _id: data.id,
@@ -180,7 +229,8 @@ router.post("/sign_up", async (request, response) =>{
         response.status(401).json({errors})
       }else{
         const logsModel = await new LogsModel({
-          data: user.fName + ' ' + user.lName + ' ' +'has updated their password',
+          user: user.fName + ' ' + user.lName,
+          action: 'password update'
         })
         logsModel.save()
         const newPassword = await  bcrypt.hash(data.password,10)
@@ -189,32 +239,7 @@ router.post("/sign_up", async (request, response) =>{
         })
         response.status(200).json({ message : 'Update Success'})
       }
-      
   })
-
-//sign_in
-  /* router.post("/sign_in", async (request, response) => {
-
-    const user = await UserModel.findOne({
-      username: request.body.username,
-    })
-  
-    if(!user){
-      return response.json({status:'user-not-found'})
-    }
-  
-    const isPasswordCorrect = await bcrypt.compare(
-      request.body.password,
-      user.password
-  
-    )
-  
-    if (isPasswordCorrect){
-          return response.json({status:'user-found'})
-    }else{
-          return response.json({status:'user-not-found'})
-    }
-  }); */
 
   //take token from  user
   router.post("/refresh", (request, response)=>{
@@ -239,36 +264,7 @@ router.post("/sign_up", async (request, response) =>{
   })
 
 
-  const generateAccessToken = (user)=>{
-    return jwt.sign({
-        id: user._id,
-        fName: user.fName,
-        mName: user.mName,
-        lName: user.lName,
-        username: user.username,
-        level: user.level,
-        phase: user.phase,
-        area: user.area,
-        type: user.type
-        
-      },"sampleSecretKey",{
-        expiresIn:"15m"
-      })
-  }
 
-  const generateRefreshToken = (user) => {
-    return jwt.sign({
-        id: user._id,
-        fName: user.fName,
-        mName: user.mName,
-        lName: user.lName,
-        username: user.username,
-        level: user.level,
-        phase: user.phase,
-        area: user.area,
-        type: user.type
-      },"sampleRefreshSecretKey")
-  }
 
   router.post("/sign_in", async (request, response) => {
     const user = await UserModel.findOne({
@@ -289,7 +285,8 @@ router.post("/sign_up", async (request, response) =>{
           const refreshToken = generateRefreshToken(user)
           const findTokenInDb = await RefreshTokenModel.findOne({user:user._id})
           const logsModel = new LogsModel({
-            data: user.fName + ' ' + user.lName + ' ' +'has logged in',
+            user: user.fName + ' ' + user.lName,
+            action: 'logged in'
           })
           logsModel.save();
           if(!findTokenInDb){
@@ -320,7 +317,8 @@ router.post("/sign_up", async (request, response) =>{
     const refreshToken = request.body.token
     
     const logsModel = new LogsModel({
-      data: request.body.personName + ' ' +'has logged out',
+      user: request.body.personName,
+      action: 'logged out'
     })
     logsModel.save();
 
@@ -342,6 +340,10 @@ router.post("/sign_up", async (request, response) =>{
 
       LevelModel.find({}).then(data => 
         {
+          let levelValue = 1
+          for (let i = 0; i<data.length; i++){
+              levelValue = data.length + 1
+          }
           if(data.length<4){
             var dir = './files/'+request.body.level;
 
@@ -350,18 +352,19 @@ router.post("/sign_up", async (request, response) =>{
       
                 try{
                   const logsModel = new LogsModel({
-                    data: request.body.personName + ' ' +'created a new level',  
+                    user: request.body.personName,
+                    action: 'created a new level'
                   })
                   logsModel.save();
 
-                    LevelModel.create({
-                      level: [],
-                      value:  data.length+1
-                      },(err,doc)=>{
-                        if(!err){
-                          response.json({doc})
-                        }
-                    })
+                  LevelModel.create({
+                    level: [],
+                    value:  data.length+1
+                    },(err,doc)=>{
+                      if(!err){
+                        response.json({doc})
+                      }
+                  })
 
                 }catch(err){
                   console.log(err)
@@ -375,19 +378,39 @@ router.post("/sign_up", async (request, response) =>{
           }
         }
       );
-      
   });
 
-  router.get('/load-levels', (request, response) => {
+  router.get('/load-levels',(request, response) => {
 
-        let newArr = []
-        LevelModel.find({}).then(data => 
-          {
-            response.json({data})
-          }
-        );
-      
-    });
+    let newArr = []
+    LevelModel.find({}).then(data => 
+      {
+        response.json({data})
+      });
+  });
+
+  router.post('/logs', async (request, response)=>{
+    await LogsModel.find({})
+     .then((data)=>{
+      //  console.log('Data: ', data)
+       response.json(data)
+     })
+     .catch((error)=>{
+       console.log("Error: ", error)
+     })
+   })
+
+   router.post('/file-uploads', async (request, response)=>{
+    await FileModel.find({})
+     .then((data)=>{
+      //  console.log('Data: ', data)
+       response.json(data)
+     })
+     .catch((error)=>{
+       console.log("Error: ", error)
+     })
+   })
+
 
   router.get('/levels', async (request, response)=>{
     await LevelModel.find({})
@@ -410,7 +433,8 @@ router.post("/sign_up", async (request, response) =>{
                 fs.mkdirSync(dir);
                 try{
                   const logsModel = new LogsModel({
-                    data: request.body.personName + ' ' +'created a new phase',  
+                    user: request.body.personName,  
+                    action: 'created a new phase'
                   })
                   await logsModel.save();
                   LevelModel.find({}).then(async data => {
@@ -463,10 +487,9 @@ router.post("/sign_up", async (request, response) =>{
               phases.push(i+1)
             }
             response.json({phases})    
-    }) 
-
-   
+    })   
 });
+
 
 
   //create param
@@ -481,7 +504,8 @@ router.post("/sign_up", async (request, response) =>{
         fs.mkdirSync(dir);
         try{
           const logsModel = new LogsModel({
-            data: request.body.personName + ' ' +'created a new parameter',  
+            user: request.body.personName,
+            action: 'created a new parameter'
           })
           logsModel.save();
           LevelModel.find({}).then(async data => {
@@ -537,7 +561,7 @@ router.post('/load-params', async (request, response) => {
     const files = req.files.files;
     const doc = req.files.document;
     const docname = doc.name
-    // console.log(filename)
+
     // console.log(docname)
   
     doc.mv(`${newpath}${docname}`, (err) => {
@@ -551,7 +575,8 @@ router.post('/load-params', async (request, response) => {
             const blobStr = data.toString();
             blobData = JSON.parse(blobStr)
             dir = './files/'+blobData.dir+'/';
-  
+
+            
             if(typeof(files)=='object'&&files.length>0){
                 let filesObj = []
                 files.forEach(function (item,id,array) {
@@ -561,12 +586,17 @@ router.post('/load-params', async (request, response) => {
                       res.status(500).send({ message: "File upload failed", code: 200 });
                     }else{
                       const logsModel = new LogsModel({
-                        data: req.body.personName + ' ' +'has uploaded a file',  
+                        user: blobData.personName, 
+                        action: 'uploaded a file named ' + item.name,  
+                        filename: item.name,
+                        uploadedFile: item.name,
+                        areaDir: blobData.areaDir
                       })
                       logsModel.save();
                       FileModel.create({
                         filename:item.name,
                         directory:blobData.dir,
+                        areaDir:blobData.areaDir,
                         type:item.mimetype
                       })
                         console.log({filename:item.name,directory:blobData.dir,type:item.mimetype})
@@ -588,12 +618,17 @@ router.post('/load-params', async (request, response) => {
                     res.status(500).send({ message: "File upload failed", code: 200 });
                   }else{
                     const logsModel = new LogsModel({
-                      data: req.body.personName + ' ' +'has uploaded a file',  
+                      user: blobData.personName, 
+                      action: 'uploaded a file named ' + files.name, 
+                      uploadedFile: files.name,
+                      filename: files.name,
+                      areaDir: blobData.areaDir  
                     })
                     logsModel.save();
                     FileModel.create({
                       filename:files.name,
                       directory:blobData.dir,
+                      areaDir:blobData.areaDir,
                       type:files.mimetype
                     })
                   }
@@ -622,9 +657,6 @@ router.post('/load-params', async (request, response) => {
           {
   
             let filesObj = {}
-           
-           
-  
             for(let i = 0; i < data.length; i++){
               let fileId = data[i].id;
               filesObj[i]={filename:data[i].filename,directory:data[i].directory,type:data[i].type,id:fileId}
@@ -638,7 +670,9 @@ router.post('/load-params', async (request, response) => {
   
   router.post("/download-file", (req, res) => {
     const logsModel = new LogsModel({
-      data: req.body.personName + ' ' +'has downloaded a file',  
+      user: req.body.personName,
+      action:'downloaded a file named '+req.body.filename,
+      filename: req.body.filename
     })
     logsModel.save();
     res.download('./files/'+req.body.path+'/'+req.body.filename)
@@ -655,7 +689,9 @@ router.post('/load-params', async (request, response) => {
       FileModel.deleteOne({ directory:req.body.path,filename:req.body.filename}).then(function(){
         console.log("Data deleted"); // Success
         const logsModel = new LogsModel({
-          data: req.body.personName + ' ' +'has deleted a file',  
+          user: req.body.personName,
+          action:'deleted a file named '+req.body.filename,  
+          filename: req.body.filename
         })
         logsModel.save();
         res.json({message:'ok'})
@@ -696,7 +732,9 @@ router.post('/load-params', async (request, response) => {
             }
             else{
               const logsModel = new LogsModel({
-                data: data.personName + ' ' +'has moved a file',  
+                user: req.body.personName,
+                action:'moved a file from ' + oldPath + ' to ' + newPath,
+                filename: data.filename  
               })
               logsModel.save();
                 res.json({mess:'Success',newParam:data.newParam})
@@ -704,10 +742,9 @@ router.post('/load-params', async (request, response) => {
         });
       }
     })
-   
-  
   });
 
+ 
 
   router.post("/rename-file", (req, res) => {
     data = req.body
@@ -725,7 +762,9 @@ router.post('/load-params', async (request, response) => {
             }
             else{
               const logsModel = new LogsModel({
-                data: data.personName + ' ' +'has renamed a file',  
+                user: req.body.personName,
+                action: 'renamed a file from '+data.oldFilename+data.type+' to '+data.newFilename+data.type,  
+                filename: data.newFilename+data.type
               })
               logsModel.save();
                 res.json({mess:'Success',newParam:data.newParam})
@@ -734,10 +773,9 @@ router.post('/load-params', async (request, response) => {
       }
     })
   });
-  
- 
-});
 
+
+});
 
 
 
