@@ -1,5 +1,7 @@
 import logout from '../page-components/Logout';
 import jwt_decode from 'jwt-decode'
+import {Modal, Button} from 'react-bootstrap'
+import React,{useState} from 'react'
 
 let accountType = ''
 if(localStorage.getItem('user')!==null){
@@ -10,10 +12,36 @@ if(localStorage.getItem('user')!==null){
     const decodeToken = jwt_decode(accessToken)
     accountType= decodeToken.type
 }
+
 function Navigation(){
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+
     return(
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+            <Modal
+            show={show}
+            onHide={handleClose}
+            backdrop="static"
+            keyboard={false}
+            >
+                <Modal.Header closeButton>
+                <Modal.Title>Confirmation!</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Do you really want to Sign out?
+                </Modal.Body>
+                <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                    Cancel
+                </Button>
+                <Button variant="danger" onClick={logout}>Sign Out</Button>
+                </Modal.Footer>
+            </Modal>
+
             <div className="container-fluid">
+                
                 <a className="navbar-brand" href="/home">CICT Drive</a>
 
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,7 +63,7 @@ function Navigation(){
                             </a>
                             <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <li><a className="dropdown-item" href="/profile">Update</a></li>
-                                <li><a className="dropdown-item" onClick={logout} href='#'>Sign Out</a></li>
+                                <li><a className="dropdown-item" onClick={handleShow} href='#'>Sign Out</a></li>
                             </ul>
                         </li>
                     </div>

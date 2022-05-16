@@ -11,24 +11,22 @@ const logout = async(e)=> {
         const personName = decodeToken.fName + ' ' + decodeToken.lName
 
         const refreshToken = object.refreshToken
-            if(window.confirm("Do you want to logout?")===true){
-                axios.delete('http://localhost:1337/cictdrive/logout',{
-                    headers:{
-                        Authorization: 'Bearer '+object.accessToken
-                    },
-                    data:{
-                        token: refreshToken,
-                        personName: personName
-                    }
-                    
-                })
-                console.log('signed out')
-                localStorage.removeItem('user')
-                
-                window.location.reload()
-            }else{
-                console.log('cancelled')
+
+        axios.delete('http://localhost:1337/cictdrive/logout',{
+            headers:{
+                Authorization: 'Bearer '+object.accessToken
+            },
+            data:{
+                token: refreshToken,
+                personName: personName
             }
+            
+        })
+        console.log('signed out')
+        localStorage.removeItem('user')
+        
+        window.location.reload()
+
         } catch (error) {
             console.log(error)
         }

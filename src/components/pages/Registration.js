@@ -6,6 +6,7 @@ import "../css/style.css"
 import axios from 'axios'
 import bg9 from '../img/bg9.png'
 import jwt_decode from 'jwt-decode'
+import {Modal} from 'react-bootstrap'
 
 function Registration(){
        
@@ -26,6 +27,14 @@ function Registration(){
     const[phase,setPhase] = useState('');
     const[area,setArea] = useState('');
     const[type,setType] = useState('');
+
+    const handleClose = () => 
+    {
+        setShow(false);
+        window.location.href = '/registration';
+    }
+    const handleShow = () => setShow(true);
+    const [show, setShow] = useState(false);
 
     // container current selected value of level
     
@@ -70,7 +79,7 @@ function Registration(){
                     let num =0 
                     return(
                         phases.map((phasess)=>(
-                            <option value={num++} key={num} >Phase {num}</option>
+                            <option value={num+1} key={num} >Phase {num}</option>
                         ))
                     )
                 }
@@ -150,8 +159,8 @@ function Registration(){
                  {
                      console.log(data.message)
                      if(data.message==='success'){
-                         alert('Succesfully Created!')
-                         window.location.href = '/registration';
+                         handleShow()
+                     
                      }else{
                          let existError = data.message;
                          console.log(existError)
@@ -182,6 +191,25 @@ function Registration(){
 
     return(
         <div className="h-100">
+
+                    <Modal
+                        show={show}
+                        onHide={handleClose}
+                        backdrop="static"
+                        keyboard={false}
+                    >
+                            <Modal.Header closeButton>
+                                <Modal.Title>Success!</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                    You have successfully created a new account!
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <button className='btn btn-secondary' onClick={handleClose}>
+                                    Close
+                                </button>
+                            </Modal.Footer>
+                    </Modal>
 
                     <div className="row navbar-static-top">
                         <div className="col">

@@ -201,6 +201,7 @@ function Parameter(props){
                                     <div className='row text-light justify-content-center p-2' style={{ height: '92.5%'}}>
                                         <div className='col-12'>
                                             {
+                                                
                                                 userAreaURL === currentAreaURL &&
                                                 <button className='btn-dark form-control my-2' onClick={handleShow}>Upload File</button>
 
