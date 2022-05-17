@@ -5,6 +5,7 @@ import axios from 'axios';
 import jwt_decode from 'jwt-decode'
 import bg5 from '../img/bg5.png'
 import bg11 from '../img/bg11.png'
+import {Modal, Button as ReactButton} from 'react-bootstrap'
 
 
 function SignIn(){
@@ -13,6 +14,15 @@ function SignIn(){
     const[username,setUsername] = useState('');
     const[password,setPassword] = useState('');
     const[user,setUser] = useState(null)
+
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => 
+    {
+        setShow(false);
+        window.location.href = '/home'
+    }
+    const handleShow = () => setShow(true);
 
     const refreshToken = async()=>{
         try {
@@ -59,7 +69,7 @@ function SignIn(){
             if(response.data.accessToken){
                 if(response.status === 200){
                     localStorage.setItem('user', JSON.stringify(response.data))
-                    window.location.href  = '/home'
+                    handleShow()
                 }
             }
             // console.log(response.data)
@@ -72,6 +82,17 @@ function SignIn(){
     return(
        <div className="row h-100" style={{ backgroundImage: `url(${bg11})`,  backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundPosition: 'center'}}>
             
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                <Modal.Title>Success!</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>Congratulations! let's now proceed!</Modal.Body>
+                <Modal.Footer>
+                <ReactButton variant="success" onClick={handleClose}>
+                        Proceed
+                </ReactButton>
+                </Modal.Footer>
+            </Modal>
             <div className="col-md-6 col-sm-12 my-auto">    
 
                 {/* login card */}
