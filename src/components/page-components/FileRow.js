@@ -13,7 +13,7 @@ function FileRow(props){
     const personName = decodeToken.fName + ' ' + decodeToken.lName
 
     const [show, setShow] = useState(false);
-    const [showRename, setShowRename] = useState(false);
+   
     const[dir,setDir] = useState([]);
     const[renameFile,setRenameFile] = useState('')
     const handleClose = () => setShow(false);
@@ -23,12 +23,28 @@ function FileRow(props){
     const handleDelCloseConfirm = () =>setDelConfirm(false);
     const handleDelShowConfirm = () =>setDelConfirm(true);
 
+    const [showRename, setShowRename] = useState(false);
+
     const handleCloseRename = () => 
     {
         setRenameFile('')
         setShowRename(false)
     }
     const handleShowRename = () => setShowRename(true);
+
+    const [successRename, setSuccessRename] = useState(false);
+
+    const handleShowSuccessRename = () => 
+    {
+        setShowRename(false)
+        setSuccessRename(true)
+     
+    }
+    const handleCloseSuccessRename = () => 
+    {
+        setSuccessRename(false);
+        window.location.href='/home/level/'+props.path
+    }
 
     const params = useParams()
 
@@ -142,8 +158,8 @@ function FileRow(props){
         }).then(data=>data.json()).then(data=>
             {
                 if(data.mess==="Success"){
-                    alert('File is Succesfully Renamed')
-                    window.location.href='/home/level/'+props.path
+                    handleShowSuccessRename()
+                    
                 } 
              })
     }
@@ -167,6 +183,20 @@ function FileRow(props){
                 </Modal.Body>
             </Modal>
 
+            <Modal show={successRename} onHide={handleCloseSuccessRename} aria-labelledby="contained-modal-title-vcenter">
+                <Modal.Header closeButton>
+                    <Modal.Title>Successfully Renamed!</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    You have succesfully rename the file!
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="success" onClick={handleCloseSuccessRename}>
+                        Proceed
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
 
 
             <Modal show={showRename} onHide={handleCloseRename} aria-labelledby="contained-modal-title-vcenter" centered>
@@ -187,6 +217,7 @@ function FileRow(props){
                     </div>     
                 </form>
                 </Modal.Body>
+                
             </Modal>
 
             <Modal show={showDelConfirm} onHide={handleDelCloseConfirm} aria-labelledby="contained-modal-title-vcenter" centered>
