@@ -7,7 +7,7 @@ import axios from 'axios'
 import bg14 from '../img/bg14.png'
 import bg15 from '../img/bg15.png'
 import jwt_decode from 'jwt-decode'
-
+import {Modal, Button as ReactButton} from 'react-bootstrap'
 function UpdateProfile(){
 
     const user = localStorage.getItem('user')
@@ -57,53 +57,79 @@ function UpdateProfile(){
         e.preventDefault()
         setNameErrors(validateName(fName,lName))
         
-        try{
-            if(Object.keys(nameErrors).length === 0){
-                const response =  axios.post('http://localhost:1337/cictdrive/update_name',({
-                    fName, mName, lName, id
-                }))
-                
+        if(Object.keys(nameErrors).length === 0){
+
+
+            axios.post('http://localhost:1337/cictdrive/update_name',({
+                fName, mName, lName, id
+
+            })).then(response =>{
                 if(response.status ===200){
                     console.log(response.data)
-                    localStorage.setItem("user",JSON.stringify(response.data))
-                    window.location.reload()
                     
-                }else{
-                    console.log(response.data)
-                    //valdation dito
+                    localStorage.setItem("user",JSON.stringify(response.data))
+                    handleShow()
+                   
+                    
                 }
-            }
-        }catch(error){
-            console.log(error)
+            })
+
+            
         }
     }
     const updatePassword = (e)=>{
         e.preventDefault()
         setPasswordErrors(validatePassword(password,confirmPassword))
-        try {
+
             if(Object.keys(passwordErrors).length === 0){
-                const response =  axios.post('http://localhost:1337/cictdrive/update_password',({
+
+                axios.post('http://localhost:1337/cictdrive/update_password',({
                     password, confirmPassword, id
-                }))
-                if (response.status === 200){
-                    alert(response.data.message)
-                    window.location.reload()
-                }else{
+
+            })).then(response =>{
+                if(response.status ===200){
                     console.log(response.data)
+                    
+                    localStorage.setItem("user",JSON.stringify(response.data))
+                    handleShow()
+                    
                 }
-                window.location.reload()
+            })
+   
             }
-        } catch (error) {
-            console.log(error)
-        }
+       
     }
     
+     const [show, setShow] = useState(false);
 
-    
+     const handleClose = () => 
+     {
+         setShow(false);
+        //setTimeout(() => window.location.reload(), 3000)
+         window.location.reload();
+     }
+        const handleShow = () => setShow(true);
 
     return(
         <div className="h-100">
-
+                <Modal
+                        show={show}
+                        onHide={handleClose}
+                        backdrop="static"
+                        keyboard={false}
+                    >
+                            <Modal.Header closeButton>
+                                <Modal.Title>Success!</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                    Update Success!
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <button className='btn btn-secondary' onClick={handleClose}>
+                                    Close
+                                </button>
+                            </Modal.Footer>
+                    </Modal>
                     <div className="row navbar-static-top">
                         <div className="col">
                             <Navigation />
