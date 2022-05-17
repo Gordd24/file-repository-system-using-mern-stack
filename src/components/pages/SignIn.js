@@ -24,6 +24,15 @@ function SignIn(){
     }
     const handleShow = () => setShow(true);
 
+    const [showWrong, setShowWrong] = useState(false);
+
+    const handleCloseWrong = () => 
+    {
+        setShowWrong(false);
+        setPassword('')
+    }
+    const handleShowWrong = () => setShowWrong(true);
+
     const refreshToken = async()=>{
         try {
             const response = await axios.post('http://localhost:1337/cictdrive/refresh')
@@ -74,8 +83,7 @@ function SignIn(){
             }
             // console.log(response.data)
         } catch (error) {
-            alert('Username or password is incorrect')
-            console.log(error)
+            handleShowWrong()
         }
     } 
 
@@ -93,6 +101,19 @@ function SignIn(){
                 </ReactButton>
                 </Modal.Footer>
             </Modal>
+
+            <Modal show={showWrong} onHide={handleCloseWrong}>
+                <Modal.Header closeButton>
+                <Modal.Title>Failed!</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>Please Confirm your Credentials.</Modal.Body>
+                <Modal.Footer>
+                <ReactButton variant="danger" onClick={handleCloseWrong}>
+                        Ok
+                </ReactButton>
+                </Modal.Footer>
+            </Modal>
+
             <div className="col-md-6 col-sm-12 my-auto">    
 
                 {/* login card */}
