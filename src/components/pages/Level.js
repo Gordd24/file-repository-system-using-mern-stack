@@ -14,6 +14,7 @@ function Level(props){
     const accessToken = object.accessToken
     const decodeToken = jwt_decode(accessToken)
     const personName = decodeToken.fName + ' ' + decodeToken.lName
+    const accountType = decodeToken.type
 
     const [show, setShow] = useState(false);
 
@@ -123,10 +124,13 @@ function Level(props){
                                         <a href={'/home/level/'+params.id} className='btn text-decoration-underline text-dark'><strong>Level{' '+params.id}</strong></a> 
                                     </div>
                                 </div>
-
-                                <div  onClick={handleShow} className='btn col-4 col-sm-4 col-md-3 d-xs-block d-sm-block d-md-block d-lg-none justify-content-left bg-dark text-light'>
+                                {
+                                    accountType === 'admin' && 
+                                    <div  onClick={handleShow} className='btn col-4 col-sm-4 col-md-3 d-xs-block d-sm-block d-md-block d-lg-none justify-content-left bg-dark text-light'>
                                     Create Phase
-                                </div>
+                                    </div>
+                                }
+                                
                             </div>
 
 
@@ -141,7 +145,11 @@ function Level(props){
 
                                     <div className='row text-light justify-content-center p-2' style={{ height: '92.5%'}}>
                                         <div className='col-12'>
-                                            <button className='btn-dark form-control my-2' onClick={handleShow}>Create Phase</button>
+                                            {
+                                                accountType === 'admin' &&
+                                                <button className='btn-dark form-control my-2' onClick={handleShow}>Create Phase</button>
+                                            }
+                                            
                                         </div>
                                     </div>
 

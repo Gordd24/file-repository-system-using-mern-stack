@@ -6,6 +6,7 @@ import bg9 from '../img/bg9.png'
 import { Tab, Tabs , Table, Dropdown, DropdownButton} from 'react-bootstrap';
 import LogFileRow from '../page-components/LogFileRow';
 import ActionRow from '../page-components/ActionRow';
+import moment from 'moment';
 
 function Logs(){
 
@@ -14,15 +15,28 @@ function Logs(){
     
     const[upFiles,setUpFiles] = useState([])
     const[areaFiles,setAreaFiles] = useState([])
+    const[actions,setActions] = useState([])
     const[areaVal,setAreaVal] = useState('')
     const handleAreaSelect = (e) =>{
         console.log(e)
         setAreaVal(e)
     }
-
+    const[date, setDate] = useState('')
+    const[actionDate, setActionDate] = useState('')
+    const handleDateSelect = (e)=>{
+        console.log(e)
+        setDate(e)
+    }
+    const handleActionDateSelect = (e)=>{
+        console.log(e)
+        setActionDate(e)
+    }
+    //dates today, week, month
+    const dateToday = moment().format('L'); 
+    const dateLastWeek =moment().subtract(7, 'days').calendar();
+    const dateLastMonth =moment().subtract(30, 'days').calendar();
+   
     
-
-    const[actions,setActions] = useState([])
     useEffect(()=>{
         
         axios.post(logsUrl).then(response =>{
@@ -34,10 +48,95 @@ function Logs(){
             setAreaFiles(response.data)
         })
         
-        // setUpFiles([<LogFileRow filename='text.txt' upload='12/12/12' key={1} />])
-        // setAreaFiles([<LogFileRow filename='textFinal.txt' upload='12/12/12' key={1} />])
-        // setActions([<ActionRow user="jasper" action="creates" date="10/10/10"/>])
     },[logsUrl])
+
+
+    function renderFileLogs(){
+        if(!moment(date).isValid()){
+            
+            return(
+                upFiles.map((getUpFiles)=>(
+                    getUpFiles.filename) &&
+                    <LogFileRow filename={getUpFiles.filename} upload={moment(getUpFiles.date).format('L')} key={getUpFiles.filename}  />
+                ))
+        }
+
+        else if(moment(date).isSame(dateToday)){
+            
+                return(
+                    upFiles.map((getUpFiles)=>(
+                        getUpFiles.filename && moment(moment(getUpFiles.date).format('L')).isSame(date) &&
+                        <LogFileRow filename={getUpFiles.filename} upload={moment(getUpFiles.date).format('L')} key={getUpFiles.filename}  />
+                    ))
+                )
+        }else{
+            
+                return(
+                    upFiles.map((getUpFiles)=>(
+                        getUpFiles.filename && moment(moment(getUpFiles.date).format('L')).isBetween(date,dateToday,undefined,"[]") &&
+                        <LogFileRow filename={getUpFiles.filename} upload={moment(getUpFiles.date).format('L')} key={getUpFiles.filename}  />
+                    ))
+                )
+            }
+        }
+    
+    function renderAreaLogs(){
+        
+       if(!areaVal){
+           
+           return(
+            areaFiles.map((getAreaFiles)=>(
+                getAreaFiles.filename &&
+               <LogFileRow filename={getAreaFiles.filename} upload={moment(getAreaFiles.date).format('L')} key={getAreaFiles.filename}/>
+           ))
+           )
+       }else{
+           
+        return(
+            areaFiles.map((getAreaFiles)=>(
+                getAreaFiles.filename && getAreaFiles.areaDir === areaVal &&
+               <LogFileRow filename={getAreaFiles.filename} upload={moment(getAreaFiles.date).format('L')} key={getAreaFiles.filename}/>
+           ))
+           )
+       }
+
+    }
+
+    function renderActionLogs(){
+            if(!moment(actionDate).isValid()){
+                
+                let num = 0;
+                
+                return(
+                    actions.map((getActions)=>(
+                        
+                        <ActionRow user={getActions.user} action={getActions.action} date={moment(getActions.date).format('L')}key={num++}/>
+                    ))
+                )
+            }
+    
+            
+         else if(moment(actionDate).isSame(dateToday)){
+                
+                let num = 0;
+                return(
+                    actions.map((getActions)=>(
+                        moment(moment(getActions.date).format('L')).isSame(actionDate) &&
+                        <ActionRow user={getActions.user} action={getActions.action} date={moment(getActions.date).format('L')}key={num++} />
+                    ))
+                )
+            }
+            else{
+                
+                let num = 0;
+                return(
+                    actions.map((getActions)=>(
+                        moment(moment(getActions.date).format('L')).isBetween(actionDate,dateToday,undefined,"[]") &&
+                        <ActionRow user={getActions.user} action={getActions.action} date={moment(getActions.date).format('L')}key={num++} />
+                    ))
+                )
+            }
+    }
 
     return(
         <div className="h-100">
@@ -77,10 +176,10 @@ function Logs(){
                                                     <div className='row overflow-auto' style={{height: '80vh'}}>
                                                         <div className='col'>
                                                         <div className='my-2'>
-                                                        <DropdownButton variant="dark" id="dropdown-basic-button" title="View By ">
-                                                            <Dropdown.Item href="#">This Day</Dropdown.Item>
-                                                            <Dropdown.Item href="#">This Week</Dropdown.Item>
-                                                            <Dropdown.Item href="#">This Month</Dropdown.Item>
+                                                        <DropdownButton variant="dark" id="dropdown-basic-button" title="View By " onSelect={handleDateSelect}>
+                                                            <Dropdown.Item eventKey={dateToday}>This Day</Dropdown.Item>
+                                                            <Dropdown.Item eventKey={dateLastWeek}>This Week</Dropdown.Item>
+                                                            <Dropdown.Item eventKey={dateLastMonth}>This Month</Dropdown.Item>
                                                         </DropdownButton>
                                                         </div>
                                                         <Table striped bordered hover>
@@ -91,10 +190,7 @@ function Logs(){
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                        {upFiles.map((getUpFiles)=>(
-                                                                getUpFiles.filename &&
-                                                               <LogFileRow filename={getUpFiles.filename} upload={getUpFiles.date} key={getUpFiles.filename}  />
-                                                           ))}
+                                                        {renderFileLogs()}
                                                         </tbody>
                                                         </Table>
 
@@ -127,10 +223,7 @@ function Logs(){
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                           {areaFiles.map((getAreaFiles)=>(
-                                                                getAreaFiles.filename && getAreaFiles.areaDir === areaVal &&
-                                                               <LogFileRow filename={getAreaFiles.filename} upload={getAreaFiles.date} key={getAreaFiles.filename}/>
-                                                           ))}
+                                                           {renderAreaLogs()}
                                                         </tbody>
                                                         </Table>
 
@@ -142,10 +235,10 @@ function Logs(){
                                                     <div className='row overflow-auto' style={{height: '80vh'}}>
                                                         <div className='col'>
                                                         <div className='my-2'>
-                                                        <DropdownButton variant="dark" id="dropdown-basic-button" title="View By ">
-                                                            <Dropdown.Item href="#">This Day</Dropdown.Item>
-                                                            <Dropdown.Item href="#">This Week</Dropdown.Item>
-                                                            <Dropdown.Item href="#">This Month</Dropdown.Item>
+                                                        <DropdownButton variant="dark" id="dropdown-basic-button" title="View By " onSelect={handleActionDateSelect}>
+                                                            <Dropdown.Item eventKey={dateToday}>This Day</Dropdown.Item>
+                                                            <Dropdown.Item eventKey={dateLastWeek}>This Week</Dropdown.Item>
+                                                            <Dropdown.Item eventKey={dateLastMonth}>This Month</Dropdown.Item>
                                                         </DropdownButton>
                                                         </div>
                                                         <Table striped bordered hover>
@@ -157,9 +250,7 @@ function Logs(){
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                           {actions.map((getActions)=>(
-                                                               <ActionRow user={getActions.user} action={getActions.action} date={getActions.date}/>
-                                                           ))}
+                                                           {renderActionLogs()}
                                                         </tbody>
                                                         </Table>
                                                         </div>

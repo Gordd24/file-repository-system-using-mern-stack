@@ -13,8 +13,12 @@ function Area(props){
     const accessToken = object.accessToken
     const decodeToken = jwt_decode(accessToken)
     const personName = decodeToken.fName + ' ' + decodeToken.lName
-
     const params = useParams()
+
+    const currentAreaURL = params.id+'/'+params.phaseId+'/'+params.areaId
+    const userAreaURL = decodeToken.level+'/'+ decodeToken.phase+'/'+ decodeToken.area
+    
+    const accountType = decodeToken.type
     const[parameterComps,setParameterComps] = useState([])
     const[parameters,setParameters] = useState([])
     const[paramName,setParamName] = useState('')
@@ -155,9 +159,14 @@ function Area(props){
                                         <a href={'/home/level/'+params.id+'/'+params.phaseId+'/'+params.areaId} className='btn text-decoration-underline text-dark'><strong>Area{' '+params.areaId}</strong></a> 
                                     </div>
                                 </div>
-                                <div  onClick={handleShow} className='btn col-4 col-sm-4 col-md-3 d-xs-block d-sm-block d-md-block d-lg-none justify-content-left bg-dark text-light'>
+                                {
+                                    (userAreaURL === currentAreaURL || accountType==='admin') &&
+
+                                    <div  onClick={handleShow} className='btn col-4 col-sm-4 col-md-3 d-xs-block d-sm-block d-md-block d-lg-none justify-content-left bg-dark text-light'>
                                     Create Parameter
                                 </div>
+                                }
+                                
                             </div>
 
 
@@ -189,8 +198,6 @@ function Area(props){
 
                         </div>
                     </div>
-
-
         </div>
     )
 }

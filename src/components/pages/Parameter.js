@@ -16,8 +16,9 @@ function Parameter(props){
     const params = useParams()
     const currentAreaURL = params.id+'/'+params.phaseId+'/'+params.areaId
     const userAreaURL = decodeToken.level+'/'+ decodeToken.phase+'/'+ decodeToken.area
-    // console.log('currentAreaUrl :'+  currentAreaURL)
-    // console.log('userAreaURL : '+ userAreaURL)
+    
+    const accountType = decodeToken.type
+   
     const [file, setFile] = useState('');
     //for displaying list of files
     const [files,setFiles] = useState([]);
@@ -182,9 +183,13 @@ function Parameter(props){
                                         <a href={'/home/level/'+params.id+'/'+params.phaseId+'/'+params.areaId+'/'+params.paramId} className='btn text-decoration-underline text-dark'><strong>Parameter{' '+params.paramId}</strong></a> 
                                     </div>
                                 </div>
-                                <div  onClick={handleShow} className='btn col-4 col-sm-4 col-md-3 d-xs-block d-sm-block d-md-block d-lg-none justify-content-left bg-dark text-light'>
-                                    Upload File
-                                </div>
+                                {
+                                    (userAreaURL === currentAreaURL || accountType==='admin') && 
+                                    <div  onClick={handleShow} className='btn col-4 col-sm-4 col-md-3 d-xs-block d-sm-block d-md-block d-lg-none justify-content-left bg-dark text-light'>
+                                        Upload File
+                                    </div>
+                                }
+                                
                 
                             </div>
 
@@ -201,7 +206,6 @@ function Parameter(props){
                                     <div className='row text-light justify-content-center p-2' style={{ height: '92.5%'}}>
                                         <div className='col-12'>
                                             {
-                                                
                                                 userAreaURL === currentAreaURL &&
                                                 <button className='btn-dark form-control my-2' onClick={handleShow}>Upload File</button>
 
