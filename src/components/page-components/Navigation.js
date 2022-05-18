@@ -4,6 +4,7 @@ import {Modal, Button} from 'react-bootstrap'
 import React,{useState} from 'react'
 
 let accountType = ''
+let firstName = ''
 if(localStorage.getItem('user')!==null){
     const user = localStorage.getItem('user')
     const object = JSON.parse(user)
@@ -11,8 +12,8 @@ if(localStorage.getItem('user')!==null){
     //decode the access token
     const decodeToken = jwt_decode(accessToken)
     accountType= decodeToken.type
+    firstName = decodeToken.fName
 }
-
 function Navigation(){
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
@@ -53,13 +54,16 @@ function Navigation(){
                         <a className="nav-link" href="/home">Home</a>
                         {
                             accountType ==='admin' &&
+                            <>
                             <a className="nav-link" href="/registration">Registration</a>
+                            <a className="nav-link" href="/Logs">Logs</a>
+                            </>
                         }
                         
-                        <a className="nav-link" href="/Logs">Logs</a>
+                        
                         <li className="nav-item dropdown">
                             <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                My Account
+                                {firstName}
                             </a>
                             <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <li><a className="dropdown-item" href="/profile">Update</a></li>
