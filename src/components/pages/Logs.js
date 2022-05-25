@@ -7,8 +7,14 @@ import { Tab, Tabs , Table, Dropdown, DropdownButton} from 'react-bootstrap';
 import LogFileRow from '../page-components/LogFileRow';
 import ActionRow from '../page-components/ActionRow';
 import moment from 'moment';
+import jwt_decode from 'jwt-decode'
 
 function Logs(){
+
+    const user = localStorage.getItem('user')
+    const object = JSON.parse(user)
+    const accessToken = object.accessToken
+    const decodeToken = jwt_decode(accessToken)
 
     const logsUrl = 'http://localhost:1337/cictdrive/logs'
     const uploadedUrl = 'http://localhost:1337/cictdrive/file-uploads'
@@ -102,6 +108,8 @@ function Logs(){
 
     }
 
+    
+
     function renderActionLogs(){
             if(!moment(actionDate).isValid()){
                 
@@ -136,6 +144,121 @@ function Logs(){
                     ))
                 )
             }
+    }
+
+
+    function generateAction(){
+        let reportRow = []
+        if(!moment(actionDate).isValid()){
+                
+            actions.map((getActions)=>{
+                    reportRow.push({name:getActions.user,action:getActions.action,date:moment(getActions.date).format('L')})
+            })
+
+        }else if(moment(actionDate).isSame(dateToday)){   
+              
+            actions.map((getActions)=>{
+                if(moment(moment(getActions.date).format('L')).isSame(actionDate))
+                {
+                    reportRow.push({name:getActions.user,action:getActions.action,date:moment(getActions.date).format('L')})
+                }
+            })
+
+        }else{
+
+            actions.map((getActions)=>{
+                if(moment(moment(getActions.date).format('L')).isBetween(actionDate,dateToday,undefined,"[]"))
+                {
+                    reportRow.push({name:getActions.user,action:getActions.action,date:moment(getActions.date).format('L')})
+                }
+            })
+        
+        }
+
+        fetch('http://localhost:1337/cictdrive/generate-action/',{
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body: JSON.stringify({
+                uploader:decodeToken.fName+' '+decodeToken.lName,
+                reportRow:reportRow,
+                scope:actionDate
+            })
+        }).then(data=>data.json()).then(data=>{
+            window.open('http://localhost:1337/cictdrive/download-action-report/', '_self');
+        })
+    }
+
+    function generateFile(){
+        let reportRow = []
+        if(!moment(date).isValid()){
+            upFiles.map((getUpFiles)=>{
+                    reportRow.push({filename:getUpFiles.filename,date:moment(getUpFiles.date).format('L')})
+            })
+        }
+
+        else if(moment(date).isSame(dateToday)){
+            upFiles.map((getUpFiles)=>{
+                if(moment(moment(getUpFiles.date).format('L')).isSame(date))
+                {
+                    reportRow.push({filename:getUpFiles.filename,date:moment(getUpFiles.date).format('L')})
+                }
+            })
+        }else{
+            upFiles.map((getUpFiles)=>{
+                if(moment(moment(getUpFiles.date).format('L')).isBetween(date,dateToday,undefined,"[]"))
+                {
+                    reportRow.push({filename:getUpFiles.filename,date:moment(getUpFiles.date).format('L')})
+                }
+            })
+        }
+       
+
+        fetch('http://localhost:1337/cictdrive/generate-file/',{
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body: JSON.stringify({
+                uploader:decodeToken.fName+' '+decodeToken.lName,
+                reportRow:reportRow,
+                scope:date
+            })
+        }).then(data=>data.json()).then(data=>{
+            window.open('http://localhost:1337/cictdrive/download-file-report/', '_self');
+        })
+    }
+
+
+    function generateArea(){
+        let reportRow = []
+        if(!areaVal){
+            areaFiles.map((getAreaFiles)=>{
+                    reportRow.push({filename:getAreaFiles.filename,date:moment(getAreaFiles.date).format('L')})
+            })
+        }else{            
+            areaFiles.map((getAreaFiles)=>{
+                if(getAreaFiles.areaDir === areaVal)
+                {
+                    reportRow.push({filename:getAreaFiles.filename,date:moment(getAreaFiles.date).format('L')})
+                }
+            })
+        }
+
+        fetch('http://localhost:1337/cictdrive/generate-area/',{
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body: JSON.stringify({
+                uploader:decodeToken.fName+' '+decodeToken.lName,
+                reportRow:reportRow,
+                scope:areaVal
+            })
+        }).then(data=>data.json()).then(data=>{
+            window.open('http://localhost:1337/cictdrive/download-area-report/', '_self');
+        })
     }
 
     return(
@@ -175,13 +298,20 @@ function Logs(){
                                                 <Tab eventKey="uploaded" title="Uploaded Files" className='px-3'>
                                                     <div className='row overflow-auto' style={{height: '80vh'}}>
                                                         <div className='col'>
-                                                        <div className='my-2'>
-                                                        <DropdownButton variant="dark" id="dropdown-basic-button" title="View By " onSelect={handleDateSelect}>
-                                                            <Dropdown.Item eventKey={dateToday}>This Day</Dropdown.Item>
-                                                            <Dropdown.Item eventKey={dateLastWeek}>This Week</Dropdown.Item>
-                                                            <Dropdown.Item eventKey={dateLastMonth}>This Month</Dropdown.Item>
-                                                        </DropdownButton>
+
+                                                        <div className='row p-2'>
+                                                            <div className='col'>
+                                                                <DropdownButton variant="dark" id="dropdown-basic-button" title="View By " onSelect={handleDateSelect}>
+                                                                    <Dropdown.Item eventKey={dateToday}>This Day</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey={dateLastWeek}>This Week</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey={dateLastMonth}>This Month</Dropdown.Item>
+                                                                </DropdownButton> 
+                                                            </div>
+                                                            <div className='col text-end'>
+                                                                <button className='btn btn-primary shadow' onClick={generateFile}>Create Report</button>
+                                                            </div>
                                                         </div>
+                                                        
                                                         <Table striped bordered hover>
                                                         <thead>
                                                             <tr>
@@ -200,19 +330,25 @@ function Logs(){
                                                 <Tab eventKey="files" title="Area Files" className='px-3'>
                                                     <div className='row overflow-auto' style={{height: '80vh'}}>
                                                         <div className='col'>
-                                                        <div className='my-2'>
-                                                            <DropdownButton id="dropdown-basic-button" variant="dark" title="Select Area" onSelect={handleAreaSelect}>
-                                                                <Dropdown.Item eventKey="1">Area 1</Dropdown.Item>
-                                                                <Dropdown.Item eventKey="2">Area 2</Dropdown.Item>
-                                                                <Dropdown.Item eventKey="3">Area 3</Dropdown.Item>
-                                                                <Dropdown.Item eventKey="4">Area 4</Dropdown.Item>
-                                                                <Dropdown.Item eventKey="5">Area 5</Dropdown.Item>
-                                                                <Dropdown.Item eventKey="6">Area 6</Dropdown.Item>
-                                                                <Dropdown.Item eventKey="7">Area 7</Dropdown.Item>
-                                                                <Dropdown.Item eventKey="8">Area 8</Dropdown.Item>
-                                                                <Dropdown.Item eventKey="9">Area 9</Dropdown.Item>
-                                                                <Dropdown.Item eventKey="10">Area 10</Dropdown.Item>
+
+                                                        <div className='row p-2'>
+                                                            <div className='col'>
+                                                                <DropdownButton id="dropdown-basic-button" variant="dark" title="Select Area" onSelect={handleAreaSelect}>
+                                                                    <Dropdown.Item eventKey="1">Area 1</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey="2">Area 2</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey="3">Area 3</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey="4">Area 4</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey="5">Area 5</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey="6">Area 6</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey="7">Area 7</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey="8">Area 8</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey="9">Area 9</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey="10">Area 10</Dropdown.Item>
                                                             </DropdownButton>
+                                                            </div>
+                                                            <div className='col text-end'>
+                                                                <button className='btn btn-primary shadow' onClick={generateArea}>Create Report</button>
+                                                            </div>
                                                         </div>
 
                                                         <Table striped bordered hover>
@@ -234,12 +370,17 @@ function Logs(){
                                                 <Tab eventKey="logs" title="Action Logs" className='px-3'>
                                                     <div className='row overflow-auto' style={{height: '80vh'}}>
                                                         <div className='col'>
-                                                        <div className='my-2'>
-                                                        <DropdownButton variant="dark" id="dropdown-basic-button" title="View By " onSelect={handleActionDateSelect}>
-                                                            <Dropdown.Item eventKey={dateToday}>This Day</Dropdown.Item>
-                                                            <Dropdown.Item eventKey={dateLastWeek}>This Week</Dropdown.Item>
-                                                            <Dropdown.Item eventKey={dateLastMonth}>This Month</Dropdown.Item>
-                                                        </DropdownButton>
+                                                        <div className='row p-2'>
+                                                            <div className='col'>
+                                                                <DropdownButton variant="dark" id="dropdown-basic-button" title="View By " onSelect={handleActionDateSelect}>
+                                                                    <Dropdown.Item eventKey={dateToday}>This Day</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey={dateLastWeek}>This Week</Dropdown.Item>
+                                                                    <Dropdown.Item eventKey={dateLastMonth}>This Month</Dropdown.Item>
+                                                                </DropdownButton>
+                                                            </div>
+                                                            <div className='col text-end'>
+                                                                <button className='btn btn-primary shadow' onClick={generateAction}>Create Report</button>
+                                                            </div>
                                                         </div>
                                                         <Table striped bordered hover>
                                                         <thead>

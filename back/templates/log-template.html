@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  *{
+    font-family: 'Courier New', Courier, monospace;
+  }
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+caption{
+  margin: 3px;
+  font-size: 20px;
+}
+</style>
+</head>
+<body>
+
+<h2>CICT Drive</h2>
+
+<table>
+  <caption><strong>Action Logs</strong> - {{scope}}</caption>
+  <tr>
+    <th>User</th>
+    <th>Action</th>
+    <th>Date</th>
+  </tr>
+  {{#each report}}
+  <tr>
+    <td>{{this.name}}</td>
+    <td>{{this.action}}</td>
+    <td>{{this.date}}</td>
+  </tr>
+  {{/each}}
+</table>
+
+</body>
+</html>

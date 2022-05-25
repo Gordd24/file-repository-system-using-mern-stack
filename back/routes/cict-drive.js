@@ -5,6 +5,9 @@ const router = express.Router();
 const jwt = require('jsonwebtoken')
 //for files
 const fs = require('fs');
+//Required package
+var pdf = require("pdf-creator-node");
+
 //middleware for uploading files, files will be accesible by req.files.filename
 const fileupload = require("express-fileupload");
 // const validator = require('../validation/validation')
@@ -737,38 +740,214 @@ router.post('/load-params', async (request, response) => {
     })
   });
 
- 
 
-  router.post("/rename-file", (req, res) => {
-    data = req.body
-    var oldPath = './files/'+data.path+'/'+data.oldFilename+'.'+data.type
-    var newPath =  './files/'+data.path+'/'+data.newFilename+'.'+data.type
-      
-      console.log('old',oldPath)
-      console.log('new',newPath)
-    fs.rename(oldPath, newPath, function (err) {
-      if (!err){
-        FileModel.findOneAndUpdate({_id:data.fileId }, 
-            {filename:data.newFilename+'.'+data.type}, null, function (err, docs) {
-            if (err){
-                console.log(err)
-            }
-            else{
-              const logsModel = new LogsModel({
-                user: req.body.personName,
-                action: 'renamed a file from '+data.oldFilename+data.type+' to '+data.newFilename+data.type,  
-                filename: data.newFilename+data.type
-              })
-              logsModel.save();
-                res.json({mess:'Success',newParam:data.newParam})
-            }
-        });
-      }
-    })
+});
+
+
+router.post("/rename-file", (req, res) => {
+  data = req.body
+  var oldPath = './files/'+data.path+'/'+data.oldFilename+'.'+data.type
+  var newPath =  './files/'+data.path+'/'+data.newFilename+'.'+data.type
+    
+    console.log('old',oldPath)
+    console.log('new',newPath)
+  fs.rename(oldPath, newPath, function (err) {
+    if (!err){
+      FileModel.findOneAndUpdate({_id:data.fileId }, 
+          {filename:data.newFilename+'.'+data.type}, null, function (err, docs) {
+          if (err){
+              console.log(err)
+          }
+          else{
+            const logsModel = new LogsModel({
+              user: req.body.personName,
+              action: 'renamed a file from '+data.oldFilename+data.type+' to '+data.newFilename+data.type,  
+              filename: data.newFilename+data.type
+            })
+            logsModel.save();
+              res.json({mess:'Success',newParam:data.newParam})
+          }
+      });
+    }
+  })
+});
+
+router.post("/load-user-profile", (req, res) => {
+  UserModel.findOne({ _id: req.body.id }, function (err, user) {
+    res.json(user)
+  });
+});
+
+
+router.post("/upload-profile-pic",(req, res) => {
+  const img = req.files.img
+  img.mv('./profile-pic/'+req.body.id+'.png', (error)=>{
+    if(!error){
+      res.json({status:1})
+    }
+  })
+});
+
+router.post("/load-profile-pic",(req, res) => {
+  fs.readFile('./profile-pic/'+req.body.id+'.png',(err,buffer)=>{
+    if(err){
+      res.json({file:'none'})
+    }else{
+      res.json({file:buffer})
+    }
+  
+  })
+});
+
+router.post('/generate-action/',(req,res)=>{
+  // Read HTML Template
+  let html = fs.readFileSync("./templates/log-template.html", "utf8");
+
+  let options = {
+    format: "8.5 x 13",
+    orientation: "portrait",
+    border: "10mm",
+    header: {
+        height: "25mm",
+        contents: '<div style="text-align: right;">Prepared By: '+req.body.uploader+'<br/>'+new Date().toLocaleDateString()+' '+new Date().toLocaleTimeString()
+    },
+    footer: {
+        height: "10mm",
+        contents: {
+            default: '<span style="color: #444;">{{page}}</span>/<span>{{pages}}</span>', // fallback value
+        }
+    }
+
+  };
+  
+
+  var document = {
+    html: html,
+    data: {
+      report: req.body.reportRow,
+      scope:req.body.scope
+    },
+    path: "./reports/action-logs.pdf",
+    type: "",
+  };
+
+  pdf
+  .create(document, options)
+  .then((doc) => {
+    res.json({doc})
+  })
+  .catch((error) => {
+    console.error(error);
   });
 
 
-});
+})
+
+router.get('/download-action-report',(req,res)=>{
+  res.download('./reports/action-logs.pdf')
+})
+
+
+
+router.post('/generate-file/',(req,res)=>{
+  // Read HTML Template
+  let html = fs.readFileSync("./templates/file-log-template.html", "utf8");
+
+  let options = {
+    format: "8.5 x 13",
+    orientation: "portrait",
+    border: "10mm",
+    header: {
+        height: "25mm",
+        contents: '<div style="text-align: right;">Prepared By: '+req.body.uploader+'<br/>'+new Date().toLocaleDateString()+' '+new Date().toLocaleTimeString()
+    },
+    footer: {
+        height: "10mm",
+        contents: {
+            default: '<span style="color: #444;">{{page}}</span>/<span>{{pages}}</span>', // fallback value
+        }
+    }
+
+  };
+
+  var document = {
+    html: html,
+    data: {
+      report: req.body.reportRow,
+      scope:req.body.scope,
+      caption:'Uploaded File Logs'
+    },
+    path: "./reports/file-logs.pdf",
+    type: "",
+  
+  };
+
+  pdf
+  .create(document, options)
+  .then((doc) => {
+    res.json({doc})
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+
+
+})
+
+
+router.get('/download-file-report',(req,res)=>{
+  res.download('./reports/file-logs.pdf')
+})
+
+
+router.post('/generate-area/',(req,res)=>{
+  // Read HTML Template
+  let html = fs.readFileSync("./templates/file-log-template.html", "utf8");
+
+  let options = {
+    format: "8.5 x 13",
+    orientation: "portrait",
+    border: "10mm",
+    header: {
+        height: "25mm",
+        contents: '<div style="text-align: right;">Prepared By: '+req.body.uploader+'<br/>'+new Date().toLocaleDateString()+' '+new Date().toLocaleTimeString()
+    },
+    footer: {
+        height: "10mm",
+        contents: {
+            default: '<span style="color: #444;">{{page}}</span>/<span>{{pages}}</span>', // fallback value
+        }
+    }
+
+  };
+
+  var document = {
+    html: html,
+    data: {
+      report: req.body.reportRow,
+      scope:req.body.scope,
+      caption:'Area Logs'
+    },
+    path: "./reports/area-logs.pdf",
+    type: "",
+  };
+
+  pdf
+  .create(document, options)
+  .then((doc) => {
+    res.json({doc})
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+
+
+})
+
+
+router.get('/download-area-report',(req,res)=>{
+  res.download('./reports/area-logs.pdf')
+})
 
 
 

@@ -66,7 +66,7 @@ function Navigation(){
                                 {firstName}
                             </a>
                             <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a className="dropdown-item" href="/profile">Update</a></li>
+                                <li><a className="dropdown-item" href="/profile">Profile</a></li>
                                 <li><a className="dropdown-item" onClick={handleShow} href='#'>Sign Out</a></li>
                             </ul>
                         </li>

@@ -4,10 +4,12 @@ import React,{useState,useEffect} from 'react';
 import Navigation from '../page-components/Navigation'
 import "../css/style.css"
 import axios from 'axios'
-import bg14 from '../img/bg14.png'
-import bg15 from '../img/bg15.png'
+import bg9 from '../img/bg9.png'
 import jwt_decode from 'jwt-decode'
-import {Modal, Button as ReactButton} from 'react-bootstrap'
+import {Modal, Button as ReactButton,Card} from 'react-bootstrap'
+import tempPic from '../img/tempPic.png'
+var Buffer = require('buffer/').Buffer
+
 function UpdateProfile(){
 
     const user = localStorage.getItem('user')
@@ -24,6 +26,49 @@ function UpdateProfile(){
     const[confirmPassword,setConfirmPassword] = useState('')
     const [nameErrors, setNameErrors] = useState({})
     const [passwordErrors, setPasswordErrors] = useState({})
+    const[profilePic,setProfilePic] = useState(tempPic)
+    const [imgFile, setImgFile] = useState('');
+
+    useEffect(()=>{
+        loadPicture()
+    },[])
+      
+    const handleSetImg = (e) => {
+        setImgFile(e.target.files[0]);
+    };
+
+    const uploadImg = (e) => {
+
+        const data = new FormData();
+        data.append('img',imgFile)
+        data.append('id',id)
+
+        fetch("http://localhost:1337/cictdrive/upload-profile-pic", {
+             method: 'POST',
+             body:data,
+        }).then(data=>data.json()).then(data=>{
+            loadPicture()
+            handleShowLeave()
+            
+        })
+    };
+
+    const loadPicture = () => {
+        fetch("http://localhost:1337/cictdrive/load-profile-pic",{
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body: JSON.stringify({
+                id:id
+            })
+        }).then(data=>data.json()).then(data=>{
+            if(data.file!=='none'){
+                const base64String = Buffer.from(data.file.data).toString('base64')
+                setProfilePic(`data:image/png;base64,${base64String}`)
+            }
+        })
+    }
 
     const validateName = (fName,lName)=>{
         const errors = {}
@@ -68,7 +113,7 @@ function UpdateProfile(){
                     console.log(response.data)
                     
                     localStorage.setItem("user",JSON.stringify(response.data))
-                    handleShow()
+                    handleShowLeave()
                    
                     
                 }
@@ -89,7 +134,7 @@ function UpdateProfile(){
             })).then(response =>{
                 if(response.status ===200){
                     console.log(response.data)
-                    handleShow()
+                    handleShowLeave()
                     
                 }
             })
@@ -97,37 +142,41 @@ function UpdateProfile(){
             }
        
     }
-    
-     const [show, setShow] = useState(false);
 
-     const handleClose = () => 
-     {
-         setShow(false);
-        //setTimeout(() => window.location.reload(), 3000)
-         window.location.reload();
-     }
-        const handleShow = () => setShow(true);
+
+    const [showLeave, setShowLeave] = useState(false);
+
+    const handleCloseLeave = () => 
+    {
+        setShowLeave(false);
+        window.location.href='/update-profile'
+    }
+    const handleShowLeave = () => 
+    {
+        setShowLeave(true);
+        
+    }
+      
 
     return(
         <div className="h-100">
-                <Modal
-                        show={show}
-                        onHide={handleClose}
-                        backdrop="static"
-                        keyboard={false}
-                    >
-                            <Modal.Header closeButton>
-                                <Modal.Title>Success!</Modal.Title>
-                            </Modal.Header>
-                            <Modal.Body>
-                                    Update Success!
-                            </Modal.Body>
-                            <Modal.Footer>
-                                <button className='btn btn-secondary' onClick={handleClose}>
-                                    Close
-                                </button>
-                            </Modal.Footer>
+
+
+                    <Modal show={showLeave} onHide={handleCloseLeave}>
+                        <Modal.Header closeButton>
+                        <Modal.Title>Confirmation</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>You have successfully made some changes, do you have something more to update?</Modal.Body>
+                        <Modal.Footer>
+                        <ReactButton variant="secondary" onClick={()=>window.location.href='/profile'}>
+                            No
+                        </ReactButton>
+                        <ReactButton variant="primary" onClick={handleCloseLeave}>
+                            Yes
+                        </ReactButton>
+                        </Modal.Footer>
                     </Modal>
+
                     <div className="row navbar-static-top">
                         <div className="col">
                             <Navigation />
@@ -137,11 +186,11 @@ function UpdateProfile(){
 
                     <div className='row m-2 shadow-lg' style={{height: '90%'}}>
 
-                        <div className='col-md-6 col-sm-12'>
+                        <div className='col-md-7 col-sm-12'>
 
                             <div className='row align-items-center bg-dark text-light' style={{height: '8%'}}>
                                 <div className='col'>
-                                    <h4>My Profile</h4>
+                                    <h4>Profile Update</h4>
                                 </div>
                             </div>
 
@@ -151,6 +200,26 @@ function UpdateProfile(){
 
                                         <div className='row overflow-auto' style={{height: '82.6vh'}}>
                                             <div className='col'>
+
+                                            <div className='row border rounded shadow mx-1 mt-3'>
+                                                    <div className='col'>
+                                                         
+                                                            <div className='row mx-1 mt-3 justify-content-center'>
+                                                                <div className='col-4 p-2 border rounded shadow'>
+                                                                        <Card.Img variant="top" src={profilePic} />
+                                                                </div>
+                                                            </div>
+
+                                                            <div className='row m-3 justify-content-center'>
+                                                                <div className='col-12 col-sm-9 mt-1'>
+                                                                    <input onChange={handleSetImg} accept="image/png, image/jpeg" type="file" className="form-control custom-file-input" id="inputGroupFile01"/>
+                                                                </div>
+                                                                <div className='col-12 col-sm-3 mt-1'>
+                                                                <button onClick={uploadImg} type='submit' value='profilepic' className='btn btn-primary form-control'>Upload</button>
+                                                                </div>
+                                                            </div>
+                                                    </div>
+                                                </div>
                                                 
                                                 <div className='row border rounded shadow mx-1 mt-3'>
                                                     <div className='col'>
@@ -197,14 +266,14 @@ function UpdateProfile(){
 
                         </div>
 
-                        <div className='col-md-6 col-sm-12 d-none d-md-block bg-dark' style={{ backgroundImage: `url(${bg14})`,  backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundPosition: 'center'}}>
+                        <div className='col-md-5 col-sm-12 d-none d-md-block bg-dark' style={{ backgroundImage: `url(${bg9})`,  backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundPosition: 'center'}}>
                             <div className='row justify-content-right'>
                                 <div className='col p-5 mt-5'>
                                     <h1 className='text-light'>
-                                        Hello There! It's been a while!
+                                        Hello there! It's been a while!
                                     </h1>
                                     <h4 className='text-light m-4'>
-                                       Keep your profile up to date champ!
+                                       Keep your profile up-to-date champ!
                                     </h4>
                                 </div>
                             </div>
