@@ -820,16 +820,50 @@ router.post('/generate-action/',(req,res)=>{
 
   };
   
-
-  var document = {
-    html: html,
-    data: {
-      report: req.body.reportRow,
-      scope:req.body.scope
-    },
-    path: "./reports/action-logs.pdf",
-    type: "",
-  };
+  if(req.body.scope === req.body.dateLastWeek){
+    var document = {
+      html: html,
+      data: {
+        report: req.body.reportRow,
+        scope:req.body.scope + ' - ' + req.body.dateToday,
+      },
+      path: "./reports/action-logs.pdf",
+      type: "",
+    };
+  }
+  else if(req.body.scope === req.body.dateLastMonth){
+    var document = {
+      html: html,
+      data: {
+        report: req.body.reportRow,
+        scope:req.body.scope + ' - ' + req.body.dateToday
+      },
+      path: "./reports/action-logs.pdf",
+      type: "",
+    };
+  }else if ((req.body.scope === req.body.dateToday)) {
+    var document = {
+      html: html,
+      data: {
+        report: req.body.reportRow,
+        scope: req.body.scope
+      },
+      path: "./reports/action-logs.pdf",
+      type: "",
+    };
+  }else{
+     var document = {
+      html: html,
+      data: {
+        report: req.body.reportRow,
+        scope: req.body.dateToday
+      },
+      path: "./reports/action-logs.pdf",
+      type: "",
+    };
+  }
+  
+  
 
   pdf
   .create(document, options)
@@ -870,17 +904,63 @@ router.post('/generate-file/',(req,res)=>{
 
   };
 
-  var document = {
-    html: html,
-    data: {
-      report: req.body.reportRow,
-      scope:req.body.scope,
-      caption:'Uploaded File Logs'
-    },
-    path: "./reports/file-logs.pdf",
-    type: "",
-  
-  };
+
+
+  if(req.body.scope === req.body.dateLastWeek){
+    var document = {
+      html: html,
+      data: {
+        report: req.body.reportRow,
+        scope:req.body.scope + ' - ' + req.body.dateToday,
+        caption:'Uploaded File Logs'
+      },
+      path: "./reports/file-logs.pdf",
+      type: "",
+    
+    };
+  }  
+  else if(req.body.scope === req.body.dateLastMonth){
+    var document = {
+      html: html,
+      data: {
+        report: req.body.reportRow,
+        scope:req.body.scope + ' - ' + req.body.dateToday,
+        caption:'Uploaded File Logs'
+      },
+      path: "./reports/file-logs.pdf",
+      type: "",
+    
+    };
+  }
+  else if(req.body.scope === req.body.dateToday){
+    var document = {
+      html: html,
+      data: {
+        report: req.body.reportRow,
+        scope:req.body.scope,
+        caption:'Uploaded File Logs'
+      },
+      path: "./reports/file-logs.pdf",
+      type: "",
+    
+    };
+  }
+  else {
+    var document = {
+      html: html,
+      data: {
+        report: req.body.reportRow,
+        scope:req.body.dateToday,
+        caption:'Uploaded File Logs'
+      },
+      path: "./reports/file-logs.pdf",
+      type: "",
+    
+    };
+  }
+
+
+ 
 
   pdf
   .create(document, options)
@@ -921,16 +1001,30 @@ router.post('/generate-area/',(req,res)=>{
 
   };
 
-  var document = {
-    html: html,
-    data: {
-      report: req.body.reportRow,
-      scope:req.body.scope,
-      caption:'Area Logs'
-    },
-    path: "./reports/area-logs.pdf",
-    type: "",
-  };
+  if(req.body.scope){
+    var document = {
+      html: html,
+      data: {
+        report: req.body.reportRow,
+        scope:req.body.scope,
+        caption:'Area Logs'
+      },
+      path: "./reports/area-logs.pdf",
+      type: "",
+    };
+  }else{
+    var document = {
+      html: html,
+      data: {
+        report: req.body.reportRow,
+        scope: '1 - 10',
+        caption:'Area Logs'
+      },
+      path: "./reports/area-logs.pdf",
+      type: "",
+    };
+  }
+  
 
   pdf
   .create(document, options)

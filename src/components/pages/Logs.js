@@ -43,6 +43,7 @@ function Logs(){
     const dateLastMonth =moment().subtract(30, 'days').calendar();
    
     
+    
     useEffect(()=>{
         
         axios.post(logsUrl).then(response =>{
@@ -183,7 +184,10 @@ function Logs(){
             body: JSON.stringify({
                 uploader:decodeToken.fName+' '+decodeToken.lName,
                 reportRow:reportRow,
-                scope:actionDate
+                scope:actionDate,
+                dateToday: dateToday,
+                dateLastWeek:dateLastWeek,
+                dateLastMonth:dateLastMonth
             })
         }).then(data=>data.json()).then(data=>{
             window.open('http://localhost:1337/cictdrive/download-action-report/', '_self');
@@ -223,7 +227,10 @@ function Logs(){
             body: JSON.stringify({
                 uploader:decodeToken.fName+' '+decodeToken.lName,
                 reportRow:reportRow,
-                scope:date
+                scope:date,
+                dateToday: dateToday,
+                dateLastWeek:dateLastWeek,
+                dateLastMonth:dateLastMonth
             })
         }).then(data=>data.json()).then(data=>{
             window.open('http://localhost:1337/cictdrive/download-file-report/', '_self');
@@ -254,7 +261,7 @@ function Logs(){
             body: JSON.stringify({
                 uploader:decodeToken.fName+' '+decodeToken.lName,
                 reportRow:reportRow,
-                scope:areaVal
+                scope:areaVal,
             })
         }).then(data=>data.json()).then(data=>{
             window.open('http://localhost:1337/cictdrive/download-area-report/', '_self');

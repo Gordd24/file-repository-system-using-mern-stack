@@ -85,14 +85,44 @@ function UpdateProfile(){
     const validatePassword = (password,confirmPassword)=>{
         const errors = {}
 
-        if (!password || !confirmPassword){
+        if (password && confirmPassword){
+            
+            if(password.length<=6){
+                errors.password="Passwords must be atleast 7 characters"
+                errors.confirmPassword=""
+            }
+            //uppercase
+            else if(!password.match(/[A-Z]/g)){
+                errors.password="Password must contain atleast 1 uppercase letter"
+                errors.confirmPassword=""
+            }
+            //lowercase
+            else if(!password.match(/[a-z]/g)){
+                errors.password="Password must contain atleast 1 lowercase letter"
+                errors.confirmPassword=""
+            }
+            //number
+            else if(!password.match(/[0-9]/g)){
+                errors.password="Password must contain atleast 1 number"
+                errors.confirmPassword=""
+            }
+            //special characters
+            else if(!password.match(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/)){
+                errors.password="Password must contain atleast 1 special character"
+                errors.confirmPassword=""
+            }
+            else{
+                if(password !== confirmPassword){
+                    errors.password="Passwords don't match"
+                    errors.confirmPassword="Passwords don't match"
+                }
+            }
+           
+            
+            
+        }else if (!password || !confirmPassword){
             if(!password)errors.password="Password is required"
             if(!confirmPassword)errors.confirmPassword="Confirm Password is required" 
-        }else{
-            if(password !== confirmPassword){
-                errors.password="Passwords don't match"
-                errors.confirmPassword="Passwords don't match"
-            }
         }
         
         return errors

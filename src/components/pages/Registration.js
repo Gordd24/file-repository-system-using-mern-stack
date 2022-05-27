@@ -79,13 +79,14 @@ function Registration(){
                     let num =0 
                     return(
                         phases.map((phasess)=>(
-                            <option value={num+1} key={num} >Phase {num}</option>
+                            <option value={++num} key={num} >Phase {num}</option>
                         ))
                     )
                 }
                 
             }
         }
+        
         
 
     const validate = (fName,lName,email,username,password,confirmPassword,level,phase,area,type)=>{
@@ -107,12 +108,39 @@ function Registration(){
             errors.username="Username is required"
         }
         if (password && confirmPassword){
-            if(password !== confirmPassword){
-                errors.password="Passwords don't match"
-                errors.confirmPassword="Passwords don't match"
-            }
             
-        }else if (!password || !confirmPassword){
+            if(password.length<=6){
+                errors.password="Passwords must be atleast 7 characters"
+                errors.confirmPassword=""
+            }
+            //uppercase
+            else if(!password.match(/[A-Z]/g)){
+                errors.password="Password must contain atleast 1 uppercase letter"
+                errors.confirmPassword=""
+            }
+            //lowercase
+            else if(!password.match(/[a-z]/g)){
+                errors.password="Password must contain atleast 1 lowercase letter"
+                errors.confirmPassword=""
+            }
+            //number
+            else if(!password.match(/[0-9]/g)){
+                errors.password="Password must contain atleast 1 number"
+                errors.confirmPassword=""
+            }
+            //special characters
+            else if(!password.match(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/)){
+                errors.password="Password must contain atleast 1 special character"
+                errors.confirmPassword=""
+            }
+            else{
+                if(password !== confirmPassword){
+                    errors.password="Passwords don't match"
+                    errors.confirmPassword="Passwords don't match"
+                }
+            }
+        }
+        else if (!password || !confirmPassword){
             if(!password)errors.password="Password is required"
             if(!confirmPassword)errors.confirmPassword="Confirm Password is required" 
         }
@@ -266,9 +294,9 @@ function Registration(){
                                                         
                                                         <Field error={formErrors.username} errorExist={unameExist} type="text" placeholder="Username" required="*" setVal={setUsername} val={username}/>
                                                         
-                                                        <Field error={formErrors.password} type="password" placeholder="Password" required="*" setVal={setPassword} val={password}/>
+                                                        <Field error={formErrors.password} type="text" placeholder="Password" required="*" setVal={setPassword} val={password}/>
                                                         
-                                                        <Field error={formErrors.confirmPassword} type="password" placeholder="Confirm Password" required="*" setVal={setConfirmPassword} val={confirmPassword}/>
+                                                        <Field error={formErrors.confirmPassword} type="text" placeholder="Confirm Password" required="*" setVal={setConfirmPassword} val={confirmPassword}/>
                                                         
                                                     </div>
                                                 </div>
