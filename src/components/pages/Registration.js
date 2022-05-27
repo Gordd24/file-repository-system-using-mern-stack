@@ -294,9 +294,9 @@ function Registration(){
                                                         
                                                         <Field error={formErrors.username} errorExist={unameExist} type="text" placeholder="Username" required="*" setVal={setUsername} val={username}/>
                                                         
-                                                        <Field error={formErrors.password} type="text" placeholder="Password" required="*" setVal={setPassword} val={password}/>
+                                                        <Field error={formErrors.password} type="password" placeholder="Password" required="*" setVal={setPassword} val={password}/>
                                                         
-                                                        <Field error={formErrors.confirmPassword} type="text" placeholder="Confirm Password" required="*" setVal={setConfirmPassword} val={confirmPassword}/>
+                                                        <Field error={formErrors.confirmPassword} type="password" placeholder="Confirm Password" required="*" setVal={setConfirmPassword} val={confirmPassword}/>
                                                         
                                                     </div>
                                                 </div>
