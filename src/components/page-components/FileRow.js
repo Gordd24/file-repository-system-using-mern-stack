@@ -222,10 +222,10 @@ function FileRow(props){
 
             <Modal show={showDelConfirm} onHide={handleDelCloseConfirm} aria-labelledby="contained-modal-title-vcenter" centered>
                 <Modal.Header closeButton>
-                    <Modal.Title>File Deletion</Modal.Title>
+                    <Modal.Title>File Remove</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    Are you sure you really want to delete this file?
+                    Are you sure you really want to remove this file?
                 </Modal.Body>
                 <Modal.Footer>
                             <Button variant="secondary" onClick={handleDelCloseConfirm}>
@@ -237,22 +237,6 @@ function FileRow(props){
                 </Modal.Footer>
             </Modal>
 
-            <Modal show={showDelConfirm} onHide={handleDelCloseConfirm} aria-labelledby="contained-modal-title-vcenter" centered>
-                <Modal.Header closeButton>
-                    <Modal.Title>File Deletion</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    Are you sure you really want to delete this file?
-                </Modal.Body>
-                <Modal.Footer>
-                            <Button variant="secondary" onClick={handleDelCloseConfirm}>
-                                No
-                            </Button>
-                            <Button variant="primary" onClick={del}>
-                                Confirm
-                            </Button>
-                </Modal.Footer>
-            </Modal>
 
             <Card
             text={'dark'}
@@ -267,7 +251,7 @@ function FileRow(props){
                     <div className='d-flex flex-row-reverse'>
                             <DropdownButton id="dropdown-basic-button" variant='dark' title='Action'>
                                 <Dropdown.Item onClick={handleShowRename}>Rename</Dropdown.Item>
-                                <Dropdown.Item onClick={handleDelShowConfirm}>Delete</Dropdown.Item>
+                                <Dropdown.Item onClick={handleDelShowConfirm}>Remove</Dropdown.Item>
                                 <Dropdown.Item onClick={handleShow}>Move</Dropdown.Item>
                                 <Dropdown.Item onClick={downloadFile}>Download</Dropdown.Item>
                             </DropdownButton>

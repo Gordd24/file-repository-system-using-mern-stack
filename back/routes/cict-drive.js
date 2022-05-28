@@ -649,7 +649,7 @@ router.post('/load-params', async (request, response) => {
   
   router.post("/load-files", (req, res) => {
     
-        FileModel.find({directory:req.body.dir}).then(data => 
+        FileModel.find({directory:req.body.dir,status:'active'}).then(data => 
           {
   
             let filesObj = {}
@@ -676,21 +676,21 @@ router.post('/load-params', async (request, response) => {
   });
   
   
+
+
   router.post("/delete-file", (req, res) => {
-    console.log(req.body.id)
-    const path = './files/'+req.body.path+'/'+req.body.filename
   
     try {
-      fs.unlinkSync(path)
-      FileModel.deleteOne({ directory:req.body.path,filename:req.body.filename}).then(function(){
-        console.log("Data deleted"); // Success
+      FileModel.findOneAndUpdate({ directory:req.body.path,filename:req.body.filename},{status:'unactive'}).then(function(){
+
         const logsModel = new LogsModel({
           user: req.body.personName,
-          action:'deleted a file named '+req.body.filename,  
+          action:'removed a file named '+req.body.filename,  
           filename: req.body.filename
         })
         logsModel.save();
         res.json({message:'ok'})
+
       }).catch(function(error){
           console.log(error); // Failure
       });
@@ -1041,6 +1041,51 @@ router.post('/generate-area/',(req,res)=>{
 
 router.get('/download-area-report',(req,res)=>{
   res.download('./reports/area-logs.pdf')
+})
+
+
+router.get('/load-archives',async (req,res)=>{
+  const archives = await FileModel.find({status:'unactive'})
+
+  if(archives){
+    res.json({archives})
+  }
+
+})
+
+router.post("/perma-delete-file", (req, res) => {
+  console.log('asd')
+  const path = './files/'+req.body.path+'/'+req.body.filename
+
+  try {
+    fs.unlinkSync(path)
+    FileModel.deleteOne({ _id:req.body.id}).then(function(){
+      console.log("Data deleted"); // Success
+      const logsModel = new LogsModel({
+        user: req.body.personName,
+        action:'Deleted a file named '+req.body.filename,  
+        filename: req.body.filename
+      })
+      logsModel.save();
+      res.json({message:'ok'})
+    }).catch(function(error){
+        console.log(error); // Failure
+    });
+    //file removed
+  } catch(err) {
+    console.error(err)
+  }
+
+});
+
+
+router.get('/ret-file/:id',async (req,res)=>{
+  const archives = await FileModel.findOneAndUpdate({_id:req.params.id},{status:'active'})
+
+  if(archives){
+    res.json({message:'ok'})
+  }
+
 })
 
 

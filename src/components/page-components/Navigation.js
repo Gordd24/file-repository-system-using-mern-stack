@@ -57,6 +57,7 @@ function Navigation(){
                             <>
                             <a className="nav-link" href="/registration">Registration</a>
                             <a className="nav-link" href="/Logs">Logs</a>
+                            <a className="nav-link" href="/Archives">Archives</a>
                             </>
                         }
                         

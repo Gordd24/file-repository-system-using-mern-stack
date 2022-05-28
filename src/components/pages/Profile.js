@@ -188,14 +188,17 @@ function Profile(){
 
                         <div className='col-md-7 col-sm-12'>
 
-                            <div className='row align-items-center bg-dark text-light' style={{height: '8%'}}>
+                            <div className='row align-items-center bg-dark text-light' style={{height: '9%'}}>
+                                <div className='col text-start'>
+                                    <button className='btn btn-primary' onClick={()=>window.location.href='/update-profile'}>Update My Profile</button>
+                                </div>
                                 <div className='col text-end'>
                                     <h4 className=''>{fName+"'s Profile"}</h4>
                                 </div>
                             </div>
 
                             
-                            <div className='row' style={{height: '92%'}}>
+                            <div className='row' style={{height: '91%'}}>
                                 <div className='col'>
 
                                         <div className='row overflow-auto' style={{height: '82.6vh'}}>
