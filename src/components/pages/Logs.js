@@ -3,7 +3,7 @@ import Navigation from '../page-components/Navigation'
 import "../css/style.css"
 import axios from 'axios'
 import bg9 from '../img/bg9.png'
-import { Tab, Tabs , Table, Dropdown, DropdownButton} from 'react-bootstrap';
+import { Tab, Tabs , Table, Dropdown, DropdownButton,Form,Button} from 'react-bootstrap';
 import LogFileRow from '../page-components/LogFileRow';
 import ActionRow from '../page-components/ActionRow';
 import moment from 'moment';
@@ -15,18 +15,62 @@ function Logs(){
     const object = JSON.parse(user)
     const accessToken = object.accessToken
     const decodeToken = jwt_decode(accessToken)
-
+    
     const logsUrl = 'http://localhost:1337/cictdrive/logs'
     const uploadedUrl = 'http://localhost:1337/cictdrive/file-uploads'
     
     const[upFiles,setUpFiles] = useState([])
     const[areaFiles,setAreaFiles] = useState([])
     const[actions,setActions] = useState([])
+
+    const[levelVal,setLevelVal] = useState('')
+    const[phaseVal,setPhaseVal] = useState('')
     const[areaVal,setAreaVal] = useState('')
-    const handleAreaSelect = (e) =>{
-        console.log(e)
-        setAreaVal(e)
-    }
+
+    const [levels, setLevels] = useState([])
+
+    const levelUrl = 'http://localhost:1337/cictdrive/levels'
+
+    let phases = null
+        useEffect(()=>{
+            axios.get(levelUrl)
+            .then(response => {
+            setLevels(response.data)
+            console.log(response.data)
+        })
+        },[levelUrl])
+
+        if(levels.length !== 0){
+            if(levelVal!==''){
+                for (let i = 0; i <levelVal;i++){      
+                    phases = levels[i].level
+                }
+            }
+            
+        }else{
+            console.log('loading')
+        }
+
+        function renderPhase(){
+            
+            if(levelVal!==''){
+                if(!phases){
+                    console.log('no phase')
+                }else{
+                    let num =0 
+                    return(
+                        phases.map((phasess)=>(
+                            <option value={++num} key={num} >Phase {num}</option>
+                        ))
+                    )
+                }
+                
+                
+            }
+        }
+
+        
+    
     const[date, setDate] = useState('')
     const[actionDate, setActionDate] = useState('')
     const handleDateSelect = (e)=>{
@@ -57,6 +101,7 @@ function Logs(){
         
     },[logsUrl])
 
+    
 
     function renderFileLogs(){
         if(!moment(date).isValid()){
@@ -89,11 +134,36 @@ function Logs(){
     
     function renderAreaLogs(){
         
-       if(!areaVal){
-           
+       if(!levelVal && !phaseVal && !areaVal ){
            return(
             areaFiles.map((getAreaFiles)=>(
                 getAreaFiles.filename &&
+               <LogFileRow filename={getAreaFiles.filename} upload={moment(getAreaFiles.date).format('L')} key={getAreaFiles.filename}/>
+           ))
+           )
+       }else if(levelVal && !phaseVal && !areaVal){
+        return(
+            areaFiles.map((getAreaFiles)=>(
+                getAreaFiles.filename && 
+                getAreaFiles.levelDir === levelVal && 
+               <LogFileRow filename={getAreaFiles.filename} upload={moment(getAreaFiles.date).format('L')} key={getAreaFiles.filename}/>
+           ))
+           )
+       }else if(levelVal && phaseVal && !areaVal){
+        return(
+            areaFiles.map((getAreaFiles)=>(
+                getAreaFiles.filename && 
+                getAreaFiles.levelDir === levelVal && 
+                getAreaFiles.phaseDir === phaseVal &&
+               <LogFileRow filename={getAreaFiles.filename} upload={moment(getAreaFiles.date).format('L')} key={getAreaFiles.filename}/>
+           ))
+           )
+       }else if(!levelVal && !phaseVal && areaVal){
+        return(
+            areaFiles.map((getAreaFiles)=>(
+                getAreaFiles.filename && 
+                
+                getAreaFiles.areaDir === areaVal &&
                <LogFileRow filename={getAreaFiles.filename} upload={moment(getAreaFiles.date).format('L')} key={getAreaFiles.filename}/>
            ))
            )
@@ -101,7 +171,10 @@ function Logs(){
            
         return(
             areaFiles.map((getAreaFiles)=>(
-                getAreaFiles.filename && getAreaFiles.areaDir === areaVal &&
+                getAreaFiles.filename && 
+                getAreaFiles.levelDir === levelVal && 
+                getAreaFiles.phaseDir === phaseVal &&
+                getAreaFiles.areaDir === areaVal &&
                <LogFileRow filename={getAreaFiles.filename} upload={moment(getAreaFiles.date).format('L')} key={getAreaFiles.filename}/>
            ))
            )
@@ -268,6 +341,9 @@ function Logs(){
         })
     }
 
+
+       
+
     return(
         <div className="h-100">
 
@@ -337,27 +413,45 @@ function Logs(){
                                                 <Tab eventKey="files" title="Area Files" className='px-3'>
                                                     <div className='row overflow-auto' style={{height: '80vh'}}>
                                                         <div className='col'>
-
+                                                        <form> 
                                                         <div className='row p-2'>
-                                                            <div className='col'>
-                                                                <DropdownButton id="dropdown-basic-button" variant="dark" title="Select Area" onSelect={handleAreaSelect}>
-                                                                    <Dropdown.Item eventKey="1">Area 1</Dropdown.Item>
-                                                                    <Dropdown.Item eventKey="2">Area 2</Dropdown.Item>
-                                                                    <Dropdown.Item eventKey="3">Area 3</Dropdown.Item>
-                                                                    <Dropdown.Item eventKey="4">Area 4</Dropdown.Item>
-                                                                    <Dropdown.Item eventKey="5">Area 5</Dropdown.Item>
-                                                                    <Dropdown.Item eventKey="6">Area 6</Dropdown.Item>
-                                                                    <Dropdown.Item eventKey="7">Area 7</Dropdown.Item>
-                                                                    <Dropdown.Item eventKey="8">Area 8</Dropdown.Item>
-                                                                    <Dropdown.Item eventKey="9">Area 9</Dropdown.Item>
-                                                                    <Dropdown.Item eventKey="10">Area 10</Dropdown.Item>
-                                                            </DropdownButton>
-                                                            </div>
-                                                            <div className='col text-end'>
-                                                                <button className='btn btn-primary shadow' onClick={generateArea}>Create Report</button>
-                                                            </div>
+                                                                       
+                                                                <div className='col'>
+                                                                        <Form.Select aria-label="Default select example" onChange={(e)=>setLevelVal(e.target.value)} value={levelVal}>
+                                                                            <option>--Level--</option>
+                                                                            {levels.map((getLevel)=>(
+                                                                                <option key = {getLevel._id} value = {getLevel.value}>Level {getLevel.value}</option>
+                                                                            ))}
+                                                                        </Form.Select>
+                                                                </div>
+                                                                <div className='col'>
+                                                                        <Form.Select aria-label="Default select example" onChange={(e)=>setPhaseVal(e.target.value)} value={phaseVal}>
+                                                                            <option>--Phase--</option>
+                                                                            {renderPhase()}
+                                                                        </Form.Select>
+                                                                </div>
+                                                                <div className='col'>
+                                                                        <Form.Select aria-label="Default select example" onChange={(e)=>setAreaVal(e.target.value)} value={areaVal}>
+                                                                            <option>--Area--</option>
+                                                                            <option value='1'>Area 1</option>
+                                                                            <option value="2">Area 2</option>
+                                                                            <option value="3">Area 3</option>
+                                                                            <option value="4">Area 4</option>
+                                                                            <option value="5">Area 5</option>
+                                                                            <option value="6">Area 6</option>
+                                                                            <option value="7">Area 7</option>
+                                                                            <option value="8">Area 8</option>
+                                                                            <option value="9">Area 9</option>
+                                                                            <option value="10">Area 10</option>
+                                                                        </Form.Select>
+                                                                </div>
+                                                            
+                                                                <div className='col text-end'>
+                                                                    <button className='btn btn-primary shadow' onClick={generateArea}>Create Report</button>
+                                                                </div>
                                                         </div>
-
+                                                        </form>
+                                                        
                                                         <Table striped bordered hover>
                                                         <thead>
                                                             <tr>

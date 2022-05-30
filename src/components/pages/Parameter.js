@@ -76,6 +76,8 @@ function Parameter(props){
         console.log(file);
         const obj = {
           dir: params.id+'/'+params.phaseId+'/'+params.areaId+'/'+params.paramId,
+          levelDir:params.id,
+          phaseDir:params.phaseId,
           areaDir:params.areaId,
           personName
 
@@ -206,7 +208,7 @@ function Parameter(props){
                                     <div className='row text-light justify-content-center p-2' style={{ height: '92.5%'}}>
                                         <div className='col-12'>
                                             {
-                                                userAreaURL === currentAreaURL &&
+                                                (userAreaURL === currentAreaURL || accountType==='admin') && 
                                                 <button className='btn-dark form-control my-2' onClick={handleShow}>Upload File</button>
 
                                             }

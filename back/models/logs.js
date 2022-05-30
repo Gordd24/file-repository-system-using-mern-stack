@@ -5,6 +5,8 @@ const LogsSchema = new mongoose.Schema({
         action : String,
         filename : String,
         uploadedFile: String,
+        levelDir:String,
+        phaseDir:String,
         areaDir : String,
         date : {
             type: Date,

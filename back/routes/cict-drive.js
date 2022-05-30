@@ -586,12 +586,16 @@ router.post('/load-params', async (request, response) => {
                         action: 'uploaded a file named ' + item.name,  
                         filename: item.name,
                         uploadedFile: item.name,
+                        levelDir: blobData.levelDir,
+                        phaseDir: blobData.phaseDir,
                         areaDir: blobData.areaDir
                       })
                       logsModel.save();
                       FileModel.create({
                         filename:item.name,
                         directory:blobData.dir,
+                        levelDir: blobData.levelDir,
+                        phaseDir: blobData.phaseDir,
                         areaDir:blobData.areaDir,
                         type:item.mimetype
                       })
@@ -618,12 +622,16 @@ router.post('/load-params', async (request, response) => {
                       action: 'uploaded a file named ' + files.name, 
                       uploadedFile: files.name,
                       filename: files.name,
+                      levelDir: blobData.levelDir,
+                        phaseDir: blobData.phaseDir,
                       areaDir: blobData.areaDir  
                     })
                     logsModel.save();
                     FileModel.create({
                       filename:files.name,
                       directory:blobData.dir,
+                      levelDir: blobData.levelDir,
+                      phaseDir: blobData.phaseDir,
                       areaDir:blobData.areaDir,
                       type:files.mimetype
                     })

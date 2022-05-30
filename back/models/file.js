@@ -20,6 +20,8 @@ const FileSchema = new mongoose.Schema({
         type: String, 
         default:'active'
     },
+    levelDir:String,
+    phaseDir:String,
     areaDir : String,
     date : {
         type: Date,

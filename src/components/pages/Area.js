@@ -181,7 +181,11 @@ function Area(props){
 
                                     <div className='row text-light justify-content-center p-2' style={{ height: '92.5%'}}>
                                         <div className='col-12'>
-                                            <button className='btn-dark form-control my-2' onClick={handleShow}>Create Parameter</button>
+                                            {
+                                                 (userAreaURL === currentAreaURL || accountType==='admin') &&
+                                                 <button className='btn-dark form-control my-2' onClick={handleShow}>Create Parameter</button>
+                                            }
+                                            
                                         </div>
                                     </div>
 
