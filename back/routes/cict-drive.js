@@ -1009,12 +1009,45 @@ router.post('/generate-area/',(req,res)=>{
 
   };
 
-  if(req.body.scope){
+  if(!req.body.levelVal && !req.body.phaseVal && !req.body.areaVal){
     var document = {
       html: html,
       data: {
         report: req.body.reportRow,
-        scope:req.body.scope,
+        scope: 'All Files',
+        caption:'Area Logs'
+      },
+      path: "./reports/area-logs.pdf",
+      type: "",
+    };
+  }else if(req.body.levelVal && !req.body.phaseVal && !req.body.areaVal){
+    var document = {
+      html: html,
+      data: {
+        report: req.body.reportRow,
+        scope:'Level '+ req.body.levelVal,
+        caption:'Area Logs'
+      },
+      path: "./reports/area-logs.pdf",
+      type: "",
+    };
+  }else if(req.body.levelVal && req.body.phaseVal && !req.body.areaVal){
+    var document = {
+      html: html,
+      data: {
+        report: req.body.reportRow,
+        scope:'Level '+ req.body.levelVal +'/Phase ' + req.body.phaseVal,
+        caption:'Area Logs'
+      },
+      path: "./reports/area-logs.pdf",
+      type: "",
+    };
+  }else if(!req.body.levelVal && !req.body.phaseVal && req.body.areaVal){
+    var document = {
+      html: html,
+      data: {
+        report: req.body.reportRow,
+        scope:'Area '+ req.body.areaVal,
         caption:'Area Logs'
       },
       path: "./reports/area-logs.pdf",
@@ -1025,13 +1058,14 @@ router.post('/generate-area/',(req,res)=>{
       html: html,
       data: {
         report: req.body.reportRow,
-        scope: '1 - 10',
+        scope:'Level '+ req.body.levelVal +'/Phase ' + req.body.phaseVal +'/Area ' + req.body.areaVal,
         caption:'Area Logs'
       },
       path: "./reports/area-logs.pdf",
       type: "",
     };
   }
+  
   
 
   pdf

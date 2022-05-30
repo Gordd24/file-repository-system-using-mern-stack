@@ -134,7 +134,7 @@ function Logs(){
     
     function renderAreaLogs(){
         
-       if(!levelVal && !phaseVal && !areaVal ){
+       if(!levelVal && !phaseVal && !areaVal){
            return(
             areaFiles.map((getAreaFiles)=>(
                 getAreaFiles.filename &&
@@ -162,7 +162,6 @@ function Logs(){
         return(
             areaFiles.map((getAreaFiles)=>(
                 getAreaFiles.filename && 
-                
                 getAreaFiles.areaDir === areaVal &&
                <LogFileRow filename={getAreaFiles.filename} upload={moment(getAreaFiles.date).format('L')} key={getAreaFiles.filename}/>
            ))
@@ -313,11 +312,31 @@ function Logs(){
 
     function generateArea(){
         let reportRow = []
-        if(!areaVal){
+        if(!levelVal && !phaseVal && !areaVal){
             areaFiles.map((getAreaFiles)=>{
                     reportRow.push({filename:getAreaFiles.filename,date:moment(getAreaFiles.date).format('L')})
             })
-        }else{            
+        }else if(levelVal && !phaseVal && !areaVal){
+                areaFiles.map((getAreaFiles)=>{
+                    getAreaFiles.filename && 
+                    getAreaFiles.levelDir === levelVal && 
+                    reportRow.push({filename:getAreaFiles.filename,date:moment(getAreaFiles.date).format('L')})
+                })
+        }else if(levelVal && phaseVal && !areaVal){
+                areaFiles.map((getAreaFiles)=>{
+                    getAreaFiles.filename && 
+                    getAreaFiles.levelDir === levelVal && 
+                    getAreaFiles.phaseDir === phaseVal &&
+                    reportRow.push({filename:getAreaFiles.filename,date:moment(getAreaFiles.date).format('L')})
+                })
+        }else if(!levelVal && !phaseVal && areaVal){
+                areaFiles.map((getAreaFiles)=>{
+                    getAreaFiles.filename &&    
+                    getAreaFiles.areaDir === areaVal &&
+                    reportRow.push({filename:getAreaFiles.filename,date:moment(getAreaFiles.date).format('L')})
+                })
+           }
+        else{            
             areaFiles.map((getAreaFiles)=>{
                 if(getAreaFiles.areaDir === areaVal)
                 {
@@ -334,7 +353,10 @@ function Logs(){
             body: JSON.stringify({
                 uploader:decodeToken.fName+' '+decodeToken.lName,
                 reportRow:reportRow,
-                scope:areaVal,
+                levelVal: levelVal,
+                phaseVal: phaseVal,
+                areaVal: areaVal,
+                scope:levelVal + '/' + phaseVal + '/' +areaVal,
             })
         }).then(data=>data.json()).then(data=>{
             window.open('http://localhost:1337/cictdrive/download-area-report/', '_self');
@@ -413,7 +435,7 @@ function Logs(){
                                                 <Tab eventKey="files" title="Area Files" className='px-3'>
                                                     <div className='row overflow-auto' style={{height: '80vh'}}>
                                                         <div className='col'>
-                                                        <form> 
+                                                         
                                                         <div className='row p-2'>
                                                                        
                                                                 <div className='col'>
@@ -445,12 +467,12 @@ function Logs(){
                                                                             <option value="10">Area 10</option>
                                                                         </Form.Select>
                                                                 </div>
-                                                            
                                                                 <div className='col text-end'>
                                                                     <button className='btn btn-primary shadow' onClick={generateArea}>Create Report</button>
-                                                                </div>
+                                                                </div>                
+                                                                
                                                         </div>
-                                                        </form>
+                                                        
                                                         
                                                         <Table striped bordered hover>
                                                         <thead>
