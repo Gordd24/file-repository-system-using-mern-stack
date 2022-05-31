@@ -56,10 +56,18 @@ function Navigation(){
                             accountType ==='admin' &&
                             <>
                             <a className="nav-link" href="/registration">Registration</a>
-                            <a className="nav-link" href="/Logs">Logs</a>
-                            <a className="nav-link" href="/Archives">Archives</a>
+                            <a className="nav-link" href="/Logs">Logs</a> 
                             </>
                         }
+                        {(
+                            ()=>{
+                                if(accountType==='admin'||accountType==='faculty')
+                                {
+                                    return <a className="nav-link" href="/Archives">Archives</a> 
+                                }
+                            }
+                        )()}
+                       
                         
                         
                         <li className="nav-item dropdown">

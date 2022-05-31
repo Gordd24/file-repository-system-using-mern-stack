@@ -623,8 +623,8 @@ router.post('/load-params', async (request, response) => {
                       uploadedFile: files.name,
                       filename: files.name,
                       levelDir: blobData.levelDir,
-                        phaseDir: blobData.phaseDir,
-                      areaDir: blobData.areaDir  
+                      phaseDir: blobData.phaseDir,
+                      areaDir: blobData.areaDir 
                     })
                     logsModel.save();
                     FileModel.create({
@@ -1130,6 +1130,19 @@ router.get('/ret-file/:id',async (req,res)=>{
 
 })
 
+router.get('/ret-all',async (req,res)=>{
+  const retAll = await FileModel.updateMany({status:'unactive'},{status:'active'})
+  if(retAll){
+    res.json({retAll})
+  }
+})
+
+router.get('/del-all',async (req,res)=>{
+  const delAll = await FileModel.deleteMany({status:'unactive'})
+  if(delAll){
+    res.json({delAll})
+  }
+})
 
 
   module.exports = router;

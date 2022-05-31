@@ -7,6 +7,8 @@ function ArchiveRow(props){
     const accessToken = object.accessToken
     const decodeToken = jwt_decode(accessToken)
     const personName = decodeToken.fName + ' ' + decodeToken.lName
+    const assignment = decodeToken.level+'/'+decodeToken.phase+'/'+decodeToken.area
+    const type = decodeToken.type
 
 
     const [showDelConf, setShowDelConf] = useState(false);
@@ -87,8 +89,20 @@ function ArchiveRow(props){
 
             <td>{props.filename}</td>
             <td className='text-center'>
-                <button className='mx-2 btn btn-primary' onClick={handleShowRetConf}>Retrieve</button>
-                <button className='mx-2 btn btn-danger' onClick={handleShowDelConf}>Delete</button>
+                {( ()=>{
+                    if(type==='admin'||(type==='faculty'&&assignment===props.assignmentPath)){
+                        return  <button className='mx-2 btn btn-primary' onClick={handleShowRetConf}>Retrieve</button>
+                    }
+                })()}
+               
+                {(
+                    ()=>{
+                        if(type==='admin'){
+                           return <button className='mx-2 btn btn-danger' onClick={handleShowDelConf}>Delete</button>
+                        }
+                    }
+                )()}
+                
             </td>
         </tr>  
     )

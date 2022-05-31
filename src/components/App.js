@@ -29,7 +29,7 @@ function App() {
             <Route path='/update-profile' element={<RequireAuth><UpdateProfile/></RequireAuth>}></Route>
             <Route path='/logs' element={<RequireAuth><AdminCheck><Logs/></AdminCheck></RequireAuth>}></Route>
             <Route path='/profile' element={<RequireAuth><Profile/></RequireAuth>}></Route>
-            <Route path='/Archives' element={<RequireAuth><AdminCheck><Archives/></AdminCheck></RequireAuth>}></Route>
+            <Route path='/Archives' element={<RequireAuth><Archives/></RequireAuth>}></Route>
           </Routes>
         </BrowserRouter>
     </div>
