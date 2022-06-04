@@ -48,6 +48,9 @@ function FileRow(props){
 
     const params = useParams()
 
+    const currentAreaURL = params.id+'/'+params.phaseId+'/'+params.areaId
+    const userAreaURL = decodeToken.level+'/'+ decodeToken.phase+'/'+ decodeToken.area
+    const accountType = decodeToken.type
     const filenameArr = props.filename.split(".");
     useEffect(()=>{
         console.log(filenameArr[0])
@@ -250,9 +253,15 @@ function FileRow(props){
                 <Card.Footer>
                     <div className='d-flex flex-row-reverse'>
                             <DropdownButton id="dropdown-basic-button" variant='dark' title='Action'>
+                                {
+                                (userAreaURL === currentAreaURL || accountType==='admin') &&
+                                <>
                                 <Dropdown.Item onClick={handleShowRename}>Rename</Dropdown.Item>
                                 <Dropdown.Item onClick={handleDelShowConfirm}>Remove</Dropdown.Item>
                                 <Dropdown.Item onClick={handleShow}>Move</Dropdown.Item>
+                                </>
+                                }
+                                
                                 <Dropdown.Item onClick={downloadFile}>Download</Dropdown.Item>
                             </DropdownButton>
                     </div>
